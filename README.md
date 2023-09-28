@@ -1,2 +1,2 @@
 # job-recommendation-server
-Server for job recommendation algorithm 
+Backend for job recommendation algorithm and training
