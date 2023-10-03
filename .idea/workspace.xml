@@ -4,7 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4895f30-dcad-4c5c-8f61-7cff715a5b5b" name="Changes" comment="" />
+    <list default="true" id="e4895f30-dcad-4c5c-8f61-7cff715a5b5b" name="Changes" comment="feat: setup for backend-api">
+      <change beforePath="$PROJECT_DIR$/src/recommdation/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/recommendation/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recommdation/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/recommendation/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recommdation/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/recommendation/apps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recommdation/migrations/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/recommendation/migrations/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recommdation/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/recommendation/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recommdation/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/recommendation/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recommdation/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/recommendation/views.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,10 +24,13 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2WG1ttIi6RFmn8eNXW6H0y5ley4" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -28,6 +39,8 @@
   "keyToString": {
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Notification.DisplayName-DoNotAsk-AWS Toolkit": "AWS Toolkit",
+    "Notification.DoNotAsk-AWS Toolkit": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
@@ -50,10 +63,24 @@
       <option name="presentableId" value="Default" />
       <updated>1696344320383</updated>
       <workItem from="1696344321582" duration="522000" />
+      <workItem from="1696344844244" duration="306000" />
     </task>
+    <task id="LOCAL-00001" summary="feat: setup for backend-api">
+      <option name="closed" value="true" />
+      <created>1696345104617</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1696345104617</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: setup for backend-api" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: setup for backend-api" />
   </component>
 </project>
