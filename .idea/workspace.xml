@@ -6,7 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="e4895f30-dcad-4c5c-8f61-7cff715a5b5b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/train.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/train.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/account/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/account/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/account/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/account/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/account/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/account/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/backend_api/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend_api/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/backend_api/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend_api/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +52,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "feat/user-login",
     "last_opened_file_path": "/home/suman/Downloads/College-projects/job-recommendation-server",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -73,6 +78,8 @@
       <updated>1696344320383</updated>
       <workItem from="1696344321582" duration="522000" />
       <workItem from="1696344844244" duration="933000" />
+      <workItem from="1696439512457" duration="18000" />
+      <workItem from="1696669557079" duration="322000" />
     </task>
     <task id="LOCAL-00001" summary="feat: setup for backend-api">
       <option name="closed" value="true" />
@@ -106,7 +113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1696345415023</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="docs: fix the steps to run the project">
+      <option name="closed" value="true" />
+      <created>1696427559220</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1696427559220</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -128,6 +143,7 @@
     <MESSAGE value="refactor: change the name of the app" />
     <MESSAGE value="feat: add the requirements file" />
     <MESSAGE value="refactor: move the compose files" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: move the compose files" />
+    <MESSAGE value="docs: fix the steps to run the project" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: fix the steps to run the project" />
   </component>
 </project>
