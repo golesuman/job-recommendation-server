@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework import response
 from rest_framework import status
 from recommendation.services.job_interaction_service import (
     create_interaction,
     get_job_details,
+    get_jobs_by_interaction,
 )
 
 from recommendation.serializers import JobDetailsSerializer
@@ -51,3 +52,12 @@ class JobApplyView(APIView):
             {"data": "Already Exists"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class HomePageAPI(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        jobs = get_jobs_by_interaction(user_id=request.user.id)
+        serializer = JobDetailsSerializer(instance=jobs, many=True)
+        return response.Response({"data": serializer.data}, status=status.HTTP_200_OK)
