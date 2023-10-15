@@ -9,8 +9,8 @@ from recommendation.services.job_interaction_service import (
     get_jobs_by_interaction,
 )
 
-from recommendation.serializers import JobDetailsSerializer
-from recommendation.models import Job
+from recommendation.serializers import CompanySerializer, JobDetailsSerializer
+from recommendation.models import Company, Job
 
 
 class JobDetailsView(APIView):
@@ -61,3 +61,20 @@ class HomePageAPI(APIView):
         jobs = get_jobs_by_interaction(user_id=request.user.id)
         serializer = JobDetailsSerializer(instance=jobs, many=True)
         return response.Response({"data": serializer.data}, status=status.HTTP_200_OK)
+
+
+class CompanyDetailsAPI(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        company_id = self.kwargs.get("company_id")
+        company = Company.objects.filter(id=company_id).first()
+        # jobs = Job.objects.filter(company_id=company_id)
+        if company:
+            serializer = CompanySerializer(instance=company)
+            return response.Response(
+                {"data": serializer.data}, status=status.HTTP_200_OK
+            )
+        return response.Response(
+            {"data": "Company Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
+        )
