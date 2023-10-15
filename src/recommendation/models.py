@@ -3,9 +3,6 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 
 
-# Create your models here.
-
-
 class Company(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)

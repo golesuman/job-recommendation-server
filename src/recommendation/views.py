@@ -31,7 +31,6 @@ class JobDetailsView(APIView):
         return response.Response(
             {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
         )
-        # pass
 
 
 class JobApplyView(APIView):
