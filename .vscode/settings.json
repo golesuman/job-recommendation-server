@@ -1,0 +1,7 @@
+{
+  "editor.defaultFoldingRangeProvider": "ms-python.python",
+  "editor.defaultFormatter": "ms-python.black-formatter",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "black-formatter.importStrategy": "useBundled"
+}

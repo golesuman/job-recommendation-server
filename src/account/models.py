@@ -35,3 +35,6 @@ class Interaction(models.Model):
 
     class Meta:
         unique_together = ('user', 'job', 'interaction_type')
+
+    def __str__(self) -> str:
+        return f"{str(self.user.username)}-{str(self.job.title)}-{str(self.interaction_type)}"
