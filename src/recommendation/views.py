@@ -9,9 +9,7 @@ from recommendation.services.job_interaction_service import (
 )
 
 from recommendation.serializers import JobDetailsSerializer
-
-
-# Create your views here.
+from recommendation.models import Job
 
 
 class JobDetailsView(APIView):
@@ -25,9 +23,14 @@ class JobDetailsView(APIView):
         create_interaction(
             user_id=user_id, interaction_type=interaction_type, job_id=job_id
         )
+
         job_details = get_job_details(job_id)
-        serializer = JobDetailsSerializer(job_details)
-        return response.Response(serializer.data)
+        if job_details:
+            serializer = JobDetailsSerializer(job_details)
+            return response.Response({"data": serializer.data})
+        return response.Response(
+            {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
+        )
         # pass
 
 
@@ -47,5 +50,5 @@ class JobApplyView(APIView):
             )
         return response.Response(
             {"data": "Already Exists"},
-            status=status.Http_400,
+            status=status.HTTP_400_BAD_REQUEST,
         )

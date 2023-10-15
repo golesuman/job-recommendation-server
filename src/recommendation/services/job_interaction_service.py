@@ -11,12 +11,20 @@ def is_interaction_present(user_id, interaction_type, job_id):
 
 def create_interaction(user_id, interaction_type, job_id):
     if not is_interaction_present(user_id, interaction_type, job_id):
-        interaction = Interaction.objects.create(
-            user_id=user_id, interaction_type=interaction_type, job_id=job_id
-        )
-
-        return interaction
+        try:
+            interaction = Interaction.objects.create(
+                user_id=user_id, interaction_type=interaction_type, job_id=job_id
+            )
+            return interaction
+        except Exception as e:
+            print(e)
+            return
 
 
 def get_job_details(job_id):
-    return Job.objects.filter(id=job_id).first()
+    try:
+        job = Job.objects.filter(id=job_id).first()
+        return job
+    except Job.DoesNotExist as e:
+        print(e)
+        return
