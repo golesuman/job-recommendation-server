@@ -11,10 +11,11 @@ def is_interaction_present(user_id, interaction_type, job_id):
 
 def create_interaction(user_id, interaction_type, job_id):
     if not is_interaction_present(user_id, interaction_type, job_id):
-        interaction = Interaction(
+        interaction = Interaction.objects.create(
             user_id=user_id, interaction_type=interaction_type, job_id=job_id
         )
-        interaction.save()
+
+        return interaction
 
 
 def get_job_details(job_id):

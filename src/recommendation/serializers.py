@@ -19,3 +19,13 @@ class JobDetailsSerializer(serializers.Serializer):
     category = serializers.CharField()
     salary = serializers.FloatField()
     posted_at = serializers.DateTimeField()
+    expires_at = serializers.DateTimeField()
+
+
+class JobPostSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    description = serializers.CharField()
+    company_id = serializers.IntegerField()
+    location = serializers.CharField()
+    job_type = serializers.CharField()
+    category = serializers.CharField()
