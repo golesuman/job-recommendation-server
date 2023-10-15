@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 
 class UserLoginView(APIView):
     def post(self, request):
+        auth = request.headers.get("Authorization")
         username = request.data.get('username')
         password = request.data.get('password')
 
