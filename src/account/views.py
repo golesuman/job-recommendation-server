@@ -4,6 +4,11 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from .serializers import InteractionSerializer, UserProfileSerializer
+from .services.user_profile_service import (
+    get_latest_user_interactions,
+    get_user_profile,
+)
 
 # Create your views here.
 from rest_framework.views import APIView
@@ -38,3 +43,23 @@ class UserLogoutView(APIView):
         return Response(
             {"message": "Successfully logged out"}, status=status.HTTP_200_OK
         )
+
+
+class UserProfileAPI(APIView):
+    # authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_id = request.user.id
+        if user_id is not None:
+            user_profile = get_user_profile(user_id)
+            interactions = get_latest_user_interactions(user_id)
+            user_profile_serializer = UserProfileSerializer(user_profile)
+            interactions_serializer = InteractionSerializer(interactions, many=True)
+            response = {
+                "profile": user_profile_serializer.data,
+                "interactions": interactions_serializer.data,
+            }
+            return Response(response, status=status.HTTP_200_OK)
+
+        # pass
