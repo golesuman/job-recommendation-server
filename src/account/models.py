@@ -1,5 +1,7 @@
+from collections.abc import Iterable
+import os
 from django.db import models
-
+import uuid
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
@@ -11,10 +13,16 @@ from recommendation.models import Job
 INTERACTION_TYPE = (("click", "click"), ("apply", "apply"))
 
 
+def get_file_path(self, instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{uuid.uuid4()}.{ext}"
+    return os.path.join('profile', filename)
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True, null=True)
-    profile_picture = models.ImageField(upload_to="profile", blank=True, null=True)
+    profile_picture = models.ImageField(upload_to=get_file_path, blank=True, null=True)
     skills = models.CharField(max_length=255, blank=True, null=True)
     experience = models.PositiveIntegerField(blank=True, null=True)
     education = models.CharField(max_length=255, blank=True, null=True)
