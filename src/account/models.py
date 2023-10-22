@@ -14,6 +14,7 @@ INTERACTION_TYPE = (("click", "click"), ("apply", "apply"))
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to="profile", blank=True, null=True)
     skills = models.CharField(max_length=255, blank=True, null=True)
     experience = models.PositiveIntegerField(blank=True, null=True)
     education = models.CharField(max_length=255, blank=True, null=True)
