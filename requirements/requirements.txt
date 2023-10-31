@@ -59,3 +59,5 @@ wheel==0.41.2
 # The following packages are considered to be unsafe in a requirements file:
 # pip
 # setuptools
+django-cors-headers
+Pillow
