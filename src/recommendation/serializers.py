@@ -11,6 +11,7 @@ class CompanySerializer(serializers.Serializer):
 
 
 class JobDetailsSerializer(serializers.Serializer):
+    id = serializers.CharField()
     title = serializers.CharField()
     description = serializers.CharField()
     company = CompanySerializer()
