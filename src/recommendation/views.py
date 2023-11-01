@@ -58,7 +58,8 @@ class HomePageAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        jobs = get_jobs_by_interaction(user_id=request.user.id)
+        # jobs = get_jobs_by_interaction(user_id=request.user.id)
+        jobs = Job.objects.all()
         serializer = JobDetailsSerializer(instance=jobs, many=True)
         return response.Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
