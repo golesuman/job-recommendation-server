@@ -14,7 +14,7 @@ services:
     ports:
       - "80:80"  # Map the host port to the container port
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf  # Mount your Nginx config file
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf  # Mount your Nginx config file
     depends_on:
       - web
     networks:
