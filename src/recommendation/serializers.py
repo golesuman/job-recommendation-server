@@ -22,6 +22,22 @@ class JobDetailsSerializer(serializers.Serializer):
     posted_at = serializers.DateTimeField()
     expires_at = serializers.DateTimeField()
 
+    def to_representation(self, instance):
+        return {
+            "id" : instance.id,
+            "title" : instance.title,
+            "description": instance.description,
+            "company_name" : instance.company.name,
+            "company_description": instance.company.description,
+            "company_website": instance.company.website,
+            "logo" : str(instance.company.logo),
+            "location" : instance.location,
+            "job_type" : instance.job_type,
+            "category" : instance.category,
+            "salary" : instance.salary,
+            "posted_at" : instance.posted_at,
+            "expires_at" : instance.expires_at,
+        }
 
 class JobPostSerializer(serializers.Serializer):
     title = serializers.CharField()
