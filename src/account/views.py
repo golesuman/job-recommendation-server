@@ -47,7 +47,7 @@ class UserLogoutView(APIView):
 
 
 class UserProfileAPI(APIView):
-    # authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
