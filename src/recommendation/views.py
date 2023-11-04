@@ -14,7 +14,8 @@ from recommendation.models import Company, Job
 
 
 class JobDetailsView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    # authentication_classes = {}
 
     def get(self, request, *args, **kwargs):
         user_id = request.user.id
