@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from .serializers import InteractionSerializer, UserProfileSerializer
 from .services.user_profile_service import (
@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 
 
 class UserLoginView(APIView):
+    permission_classes = (AllowAny,)
     def post(self, request):
         auth = request.headers.get("Authorization")
         username = request.data.get("username")
@@ -24,7 +25,7 @@ class UserLoginView(APIView):
 
         if user is not None:
             login(request, user)
-            token, _ = Token.objects.get_or_create(user=user)
+            token, created = Token.objects.get_or_create(user=user)
             return Response(
                 {"token": token.key, "user_id": user.id}, status=status.HTTP_200_OK
             )
