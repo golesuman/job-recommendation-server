@@ -11,6 +11,7 @@ from recommendation.services.job_interaction_service import (
 
 from recommendation.serializers import CompanySerializer, JobDetailsSerializer
 from recommendation.models import Company, Job
+from recommendation.services.job_recommendation_service import JobRecommendationServices
 
 
 class JobDetailsView(APIView):
@@ -21,11 +22,16 @@ class JobDetailsView(APIView):
         user_id = request.user.id
 
         job_id = self.kwargs.get("job_id")
-        interaction_type = "click"
-        create_interaction(
-            user_id=user_id, interaction_type=interaction_type, job_id=job_id
-        )
-
+        if user_id:
+            interaction_type = "click"
+            create_interaction(
+                user_id=user_id, interaction_type=interaction_type, job_id=job_id
+            )
+            # 
+            jobs = Job.objects.all()
+            print(jobs)
+            recommendation_service = JobRecommendationServices(documents=jobs, user_id=user_id)
+            recommendation_service.get_recommendations()
         job_details = get_job_details(job_id)
         if job_details:
             serializer = JobDetailsSerializer(job_details)
