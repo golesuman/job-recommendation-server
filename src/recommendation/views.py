@@ -20,7 +20,7 @@ class JobDetailsView(APIView):
 
     def get(self, request, *args, **kwargs):
         user_id = request.user.id
-
+        results = []
         job_id = self.kwargs.get("job_id")
         if user_id:
             interaction_type = "click"
@@ -31,11 +31,18 @@ class JobDetailsView(APIView):
             jobs = Job.objects.all()
             print(jobs)
             recommendation_service = JobRecommendationServices(documents=jobs, user_id=user_id)
-            recommendation_service.get_recommendations()
+            results = recommendation_service.get_recommendations(n=5)
         job_details = get_job_details(job_id)
         if job_details:
             serializer = JobDetailsSerializer(job_details)
-            return response.Response({"data": serializer.data})
+            if len(results) > 0:
+                recommended_serializer = JobDetailsSerializer(results, many=True)
+                detail_response  = {
+                        "job_details" : serializer.data,
+                        "recommendations" : recommended_serializer.data
+                }
+                return response.Response({"data": detail_response})
+            return response.Response({"data" : serializer.data}, status=status.HTTP_200_OK)
         return response.Response(
             {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
         )

@@ -51,9 +51,9 @@ class CosineSimilarity:
 
     def calculate_tfidf(self):
         tf_idf_matrix = []
-        for document in self.documents.values():
+        for key, document in self.documents.items():
             tf_idf_vector = self.fit_document(document)
-            tf_idf_matrix.append(tf_idf_vector)
+            tf_idf_matrix.append((key, tf_idf_vector))
         return tf_idf_matrix
 
 

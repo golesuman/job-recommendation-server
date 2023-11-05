@@ -9,6 +9,7 @@ class JobRecommendationServices:
         self.profile = UserProfile.objects.get(user_id=user_id)
         self.documents = documents
         self.preprocessed_documents = defaultdict()
+        self.results = {}
         self.model = CosineSimilarity(self.preprocessed_documents)
         # pass
 
@@ -25,7 +26,8 @@ class JobRecommendationServices:
             # ]
 
             self.preprocessed_documents[id] = data
-    def get_recommendations(self):
+    
+    def get_similarity_scores(self, n=5):
         profile = self.profile
         self.preprocess()
         tf_idf_matrix = self.model.calculate_tfidf()
@@ -33,12 +35,22 @@ class JobRecommendationServices:
             document=f"{profile.skills},{profile.experience}, {profile.location}, {profile.preferred_industry}, {profile.bio}"
         )
 
-        for i in range(len(tf_idf_matrix)):
-            tf_idf_vector = tf_idf_matrix[i]
+        for id, value in tf_idf_matrix:
+            tf_idf_vector = value
             
-            value = self.model.cosine_similarity(tf_idf_vector,profile_tf_idf_vector)
-            print(value)
+            result = self.model.cosine_similarity(tf_idf_vector,profile_tf_idf_vector)
+            self.results[id] = result
+        return sorted(self.results.items(), key=lambda x: x[1], reverse=True)[:n]
 
+    def get_recommendations(self, n):
+        scores = self.get_similarity_scores(n)
+        # jobs = []
+        # for score in scores:
+        #     job = Job.objects.get(id=score[0])
+        #     jobs.append(job)
+        # return jobs
+        return Job.objects.filter(id__in=[score[0] for score in scores])
         # self.model.
         # print(profile_tf_idf_vector)
-        pass
+        # pass
+
