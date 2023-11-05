@@ -44,7 +44,7 @@ class CosineSimilarity:
     def fit_document(self, document):
         terms = self.preprocess(document)
         tf = self.calculate_tf(terms)
-        print(list(self.documents.values()))
+        # print(list(self.documents.values()))
         tf_idf_vector = [tf[term] * self.calculate_idf(term) for term in terms]
         return tf_idf_vector
 

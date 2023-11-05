@@ -44,13 +44,5 @@ class JobRecommendationServices:
 
     def get_recommendations(self, n):
         scores = self.get_similarity_scores(n)
-        # jobs = []
-        # for score in scores:
-        #     job = Job.objects.get(id=score[0])
-        #     jobs.append(job)
-        # return jobs
         return Job.objects.filter(id__in=[score[0] for score in scores])
-        # self.model.
-        # print(profile_tf_idf_vector)
-        # pass
 

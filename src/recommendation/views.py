@@ -28,10 +28,10 @@ class JobDetailsView(APIView):
                 user_id=user_id, interaction_type=interaction_type, job_id=job_id
             )
             # 
-            jobs = Job.objects.all()
-            print(jobs)
+            jobs = Job.objects.exclude(id=job_id)
             recommendation_service = JobRecommendationServices(documents=jobs, user_id=user_id)
             results = recommendation_service.get_recommendations(n=5)
+            
         job_details = get_job_details(job_id)
         if job_details:
             serializer = JobDetailsSerializer(job_details)
