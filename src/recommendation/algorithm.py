@@ -6,22 +6,17 @@ class CosineSimilarity:
         # pass
         self.results = []
         self.documents = documents
-        # return 
-
+        # return
 
     def get_top_n(self, n):
-        
         sorted_result = sorted(self.results, reverse=True)
         return sorted_result[:n]
         # pass
-
-
 
     def preprocess(self, document):
         # Tokenization: Split the document into words (terms)
         terms = document.lower().split()
         return terms
-
 
     def calculate_tf(self, terms):
         tf_dict = {}
@@ -32,14 +27,14 @@ class CosineSimilarity:
             tf_dict[term] += 1 / total_terms
         return tf_dict
 
-
     def calculate_idf(self, term):
-        num_documents_with_term = sum(1 for document in list(self.documents.values()) if term in document)
+        num_documents_with_term = sum(
+            1 for document in list(self.documents.values()) if term in document
+        )
         if num_documents_with_term > 0:
             return math.log(len(self.documents) / num_documents_with_term)
         else:
             return 0
-
 
     def fit_document(self, document):
         terms = self.preprocess(document)
@@ -48,7 +43,6 @@ class CosineSimilarity:
         tf_idf_vector = [tf[term] * self.calculate_idf(term) for term in terms]
         return tf_idf_vector
 
-
     def calculate_tfidf(self):
         tf_idf_matrix = []
         for key, document in self.documents.items():
@@ -56,14 +50,11 @@ class CosineSimilarity:
             tf_idf_matrix.append((key, tf_idf_vector))
         return tf_idf_matrix
 
-
     def dot_product(self, vector1, vector2):
         return sum(x * y for x, y in zip(vector1, vector2))
 
-
     def magnitude(self, vector):
         return math.sqrt(sum(x**2 for x in vector))
-
 
     def cosine_similarity(self, doc1, doc2):
         dot_product_value = self.dot_product(doc1, doc2)
@@ -74,10 +65,11 @@ class CosineSimilarity:
             return 0  # To handle division by zero
 
         return dot_product_value / (magnitude_doc1 * magnitude_doc2)
-    
+
     def get_tf_idf_matrix(self):
         tf_idf_matrix = self.calculate_tfidf()
         return tf_idf_matrix
+
 
 class KNN:
     def __init__(self) -> None:
@@ -86,3 +78,7 @@ class KNN:
     def distance(self):
         pass
 
+
+class TFIDF:
+    def __init__(self) -> None:
+        pass

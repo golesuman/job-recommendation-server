@@ -27,22 +27,26 @@ class JobDetailsView(APIView):
             create_interaction(
                 user_id=user_id, interaction_type=interaction_type, job_id=job_id
             )
-            # 
+            #
             jobs = Job.objects.exclude(id=job_id)
-            recommendation_service = JobRecommendationServices(documents=jobs, user_id=user_id)
+            recommendation_service = JobRecommendationServices(
+                documents=jobs, user_id=user_id
+            )
             results = recommendation_service.get_recommendations(n=5)
-            
+
         job_details = get_job_details(job_id)
         if job_details:
             serializer = JobDetailsSerializer(job_details)
             if len(results) > 0:
                 recommended_serializer = JobDetailsSerializer(results, many=True)
-                detail_response  = {
-                        "job_details" : serializer.data,
-                        "recommendations" : recommended_serializer.data
+                detail_response = {
+                    "job_details": serializer.data,
+                    "recommendations": recommended_serializer.data,
                 }
                 return response.Response({"data": detail_response})
-            return response.Response({"data" : serializer.data}, status=status.HTTP_200_OK)
+            return response.Response(
+                {"data": serializer.data}, status=status.HTTP_200_OK
+            )
         return response.Response(
             {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
         )

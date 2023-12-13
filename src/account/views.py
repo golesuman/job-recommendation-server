@@ -16,6 +16,7 @@ from rest_framework.views import APIView
 
 class UserLoginView(APIView):
     permission_classes = (AllowAny,)
+
     def post(self, request):
         auth = request.headers.get("Authorization")
         username = request.data.get("username")

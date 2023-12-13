@@ -22,11 +22,13 @@ class JobRecommendationServices:
             location = document.location
             category = document.category
             salary = document.salary
-            data = f"{title}, {description}, {job_type}, {location}, {category}, {salary}"
+            data = (
+                f"{title}, {description}, {job_type}, {location}, {category}, {salary}"
+            )
             # ]
 
             self.preprocessed_documents[id] = data
-    
+
     def get_similarity_scores(self, n=5):
         profile = self.profile
         self.preprocess()
@@ -37,12 +39,12 @@ class JobRecommendationServices:
 
         for id, value in tf_idf_matrix:
             tf_idf_vector = value
-            
-            result = self.model.cosine_similarity(tf_idf_vector,profile_tf_idf_vector)
+
+            result = self.model.cosine_similarity(tf_idf_vector, profile_tf_idf_vector)
+            # if result > 0.6:
             self.results[id] = result
         return sorted(self.results.items(), key=lambda x: x[1], reverse=True)[:n]
 
     def get_recommendations(self, n):
         scores = self.get_similarity_scores(n)
         return Job.objects.filter(id__in=[score[0] for score in scores])
-
