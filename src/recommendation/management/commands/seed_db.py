@@ -13,7 +13,7 @@ class Command(BaseCommand):
     #     parser.add_argument("poll_ids", nargs="+", type=int)
 
     def handle(self, *args, **options):
-        csv_file_path = "/home/suman/Downloads/College-projects/job-recommendation-server/data/company_details/companies.csv"
+        csv_file_path = "/home/suman/Downloads/College-projects/job-recommendation-server/data/company_data.csv"
         with open(csv_file_path, "r") as file:
             reader = csv.DictReader(file)
             i = 0

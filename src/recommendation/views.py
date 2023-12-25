@@ -14,6 +14,7 @@ from recommendation.models import Company, Job
 from recommendation.services.job_recommendation_service import JobRecommendationServices
 
 
+
 class JobDetailsView(APIView):
     permission_classes = [AllowAny]
     # authentication_classes = {}
@@ -27,7 +28,6 @@ class JobDetailsView(APIView):
             create_interaction(
                 user_id=user_id, interaction_type=interaction_type, job_id=job_id
             )
-            #
             jobs = Job.objects.exclude(id=job_id)
             recommendation_service = JobRecommendationServices(
                 documents=jobs, user_id=user_id
@@ -76,8 +76,15 @@ class HomePageAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        # jobs = get_jobs_by_interaction(user_id=request.user.id)
+        user_id = request.user.id
         jobs = Job.objects.all()
+        if request.user is not None:
+            recommendation_service = JobRecommendationServices(
+                documents=jobs, user_id=user_id
+            )
+            results = recommendation_service.get_recommendations(n=5)
+            recommended_serializer = JobDetailsSerializer(results, many=True)
+            return response.Response({"data" : recommended_serializer.data}, status=status.HTTP_200_OK)
         serializer = JobDetailsSerializer(instance=jobs, many=True)
         return response.Response({"data": serializer.data}, status=status.HTTP_200_OK)
 

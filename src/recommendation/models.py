@@ -29,8 +29,12 @@ class Job(models.Model):
         ],
         default="Full-Time",
     )
+    industry = models.CharField(max_length=100, null=True)
+    experience = models.CharField(max_length=300)
+    skills = models.CharField(max_length=300)
+    role = models.CharField(max_length=255)
     category = models.CharField(max_length=50, default="Entry-Level")
-    salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    salary = models.CharField(null=True, blank=True, max_length=200)
     posted_at = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(blank=True, null=True, max_length=100)
     expires_at = models.DateTimeField(null=True)
