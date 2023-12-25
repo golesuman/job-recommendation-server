@@ -19,11 +19,11 @@ class JobRecommendationServices:
             description = document.description
             # job_type = document.job_type
             # location = document.location
-            # industry = document.industry,
+            industry = document.industry,
             category = document.category
             salary = document.skills
             data = (
-                f"{title}, {description}, {category}"
+                f"{title}, {description}, {category}, {industry}"
             )
             # ]
 
@@ -41,8 +41,8 @@ class JobRecommendationServices:
             tf_idf_vector = value
 
             result = self.model.cosine_similarity(tf_idf_vector, profile_tf_idf_vector)
-            # if result > 0.6:
-            self.results[id] = result
+            if result > 0.5: # please adjust values as your requirement
+                self.results[id] = result
         return sorted(self.results.items(), key=lambda x: x[1], reverse=True)[:n]
 
     def get_recommendations(self, n):
