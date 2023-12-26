@@ -78,7 +78,7 @@ class HomePageAPI(APIView):
     def get(self, request, *args, **kwargs):
         user_id = request.user.id
         jobs = Job.objects.all()
-        if request.user is not None:
+        if user_id is not None:
             recommendation_service = JobRecommendationServices(
                 documents=jobs, user_id=user_id
             )
