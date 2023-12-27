@@ -1,4 +1,5 @@
 import math
+import re
 
 
 class CosineSimilarity:
@@ -22,12 +23,14 @@ class CosineSimilarity:
         tf_dict = {}
         total_terms = len(terms)
         for term in terms:
+            term = self.remove_special_characters(term)
             if term not in tf_dict:
                 tf_dict[term] = 0
             tf_dict[term] += 1 / total_terms
         return tf_dict
 
     def calculate_idf(self, term):
+        term = self.remove_special_characters(term)
         num_documents_with_term = sum(
             1 for document in list(self.documents.values()) if term in document
         )
@@ -40,7 +43,10 @@ class CosineSimilarity:
         terms = self.preprocess(document)
         tf = self.calculate_tf(terms)
         # print(list(self.documents.values()))
-        tf_idf_vector = [tf[term] * self.calculate_idf(term) for term in terms]
+        tf_idf_vector = [
+            tf[self.remove_special_characters(term)] * self.calculate_idf(term)
+            for term in terms
+        ]
         return tf_idf_vector
 
     def calculate_tfidf(self):
@@ -69,6 +75,15 @@ class CosineSimilarity:
     def get_tf_idf_matrix(self):
         tf_idf_matrix = self.calculate_tfidf()
         return tf_idf_matrix
+
+    def remove_special_characters(self, word):
+        # Define a regular expression pattern to match special characters
+        pattern = r"[^a-zA-Z0-9]"
+
+        # Use re.sub() to replace matched special characters with an empty string
+        cleaned_word = re.sub(pattern, "", word)
+
+        return cleaned_word
 
 
 class KNN:
