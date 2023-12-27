@@ -22,7 +22,6 @@ class UserLoginView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        auth = request.headers.get("Authorization")
         username = request.data.get("username")
         password = request.data.get("password")
 

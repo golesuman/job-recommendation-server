@@ -5,6 +5,7 @@ from .models import UserProfile
 from rest_framework import serializers
 from recommendation.serializers import JobDetailsSerializer, CompanySerializer
 from django.db import transaction
+from django.contrib.auth.hashers import make_password
 
 
 class InteractionSerializer(serializers.Serializer):
@@ -63,7 +64,7 @@ class UserSignUpSerializer(serializers.Serializer):
                 username=self.validated_data["username"],
                 first_name=self.validated_data["first_name"],
                 last_name=self.validated_data["last_name"],
-                password=self.validated_data["password"],
+                password=make_password(self.validated_data["password"]),
                 email=self.validated_data["email"],
             )
             UserProfile.objects.create(
