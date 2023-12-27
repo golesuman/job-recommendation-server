@@ -6,7 +6,7 @@ from django.utils.text import slugify
 class Company(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
     website = models.URLField()
     logo = models.ImageField(upload_to="images/", blank=True, null=True)
 
@@ -16,9 +16,9 @@ class Company(models.Model):
 
 class Job(models.Model):
     company = models.ForeignKey(to=Company, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    location = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, null=True)
+    description = models.TextField(null=True)
+    location = models.CharField(max_length=100, null=True)
     job_type = models.CharField(
         max_length=20,
         choices=[
@@ -27,18 +27,23 @@ class Job(models.Model):
             ("Contract", "Contract"),
             ("Freelance", "Freelance"),
         ],
+        default="Full-Time",
     )
-    category = models.CharField(max_length=50)
-    salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    industry = models.CharField(max_length=100, null=True)
+    experience = models.CharField(max_length=300)
+    skills = models.CharField(max_length=300)
+    role = models.CharField(max_length=255)
+    category = models.CharField(max_length=50, default="Entry-Level")
+    salary = models.CharField(null=True, blank=True, max_length=200)
     posted_at = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(unique=True, blank=True, max_length=100)
-    expires_at = models.DateTimeField()
+    slug = models.SlugField(blank=True, null=True, max_length=100)
+    expires_at = models.DateTimeField(null=True)
     is_active = models.BooleanField(default=True)
 
-    def save(self, *args, **kwargs):
-        # Generate a slug from the job title
-        self.slug = slugify(self.title)
-        super(Job, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     # Generate a slug from the job title
+    #     self.slug = slugify(self.title)
+    #     super(Job, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title

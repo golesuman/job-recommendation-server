@@ -13,7 +13,7 @@ from recommendation.models import Job
 INTERACTION_TYPE = (("click", "click"), ("apply", "apply"))
 
 
-def get_file_path(self, instance, filename):
+def get_file_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = f"{uuid.uuid4()}.{ext}"
     return os.path.join('profile', filename)

@@ -4,7 +4,11 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from .serializers import InteractionSerializer, UserProfileSerializer
+from .serializers import (
+    InteractionSerializer,
+    UserProfileSerializer,
+    UserSignUpSerializer,
+)
 from .services.user_profile_service import (
     get_latest_user_interactions,
     get_user_profile,
@@ -16,6 +20,7 @@ from rest_framework.views import APIView
 
 class UserLoginView(APIView):
     permission_classes = (AllowAny,)
+
     def post(self, request):
         auth = request.headers.get("Authorization")
         username = request.data.get("username")
@@ -64,3 +69,17 @@ class UserProfileAPI(APIView):
             return Response(response, status=status.HTTP_200_OK)
 
         # pass
+
+
+class UserSignUpAPI(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = UserSignUpSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"data": "User Created Successfully"}, status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

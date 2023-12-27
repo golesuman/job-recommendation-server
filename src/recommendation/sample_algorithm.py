@@ -1,12 +1,12 @@
 import math
-
+from collections import defaultdict
 # Sample documents
-documents = [
-    "backend, django, devops, python",
-    "backend, python, senior ",
-    "react, bootstrap, css, frontend, junior",
-    "bootstrap, react, css, senior",
-]
+documents = {
+    1: "backend, django, devops, python",
+    2: "backend, python, senior ",
+    3: "react, bootstrap, css, frontend, junior",
+    4: "bootstrap, react, css, senior",
+}
 
 
 def preprocess(document):
@@ -35,11 +35,11 @@ def calculate_idf(documents, term):
 
 def calculate_tfidf(documents):
     tfidf_matrix = []
-    for document in documents:
+    for key, document in documents.items():
         terms = preprocess(document)
         tf = calculate_tf(terms)
-        tfidf_vector = [tf[term] * calculate_idf(documents, term) for term in terms]
-        tfidf_matrix.append(tfidf_vector)
+        tfidf_vector = [tf[term] * calculate_idf(list(documents.values()), term) for term in terms]
+        tfidf_matrix.append((key, tfidf_vector))
     return tfidf_matrix
 
 
@@ -67,15 +67,23 @@ print("the tf-idf matrix is")
 
 print(tfidf_matrix)
 
+
+print("doc1 and doc2 are:")
 doc1 = tfidf_matrix[2]
 doc2 = tfidf_matrix[3]
-
-print(" ")
+print(doc1, doc2)
+similarities = defaultdict()
+# print(" ")
 print("The similarities are :")
-for i in range(1, len(tfidf_matrix)):
-    similarity = cosine_similarity(tfidf_matrix[0], tfidf_matrix[i])
-    print(similarity)
+for item, value in tfidf_matrix:
+    # print(item, value)
+# for i in range(1, len(tfidf_matrix)):
+    similarity = cosine_similarity(tfidf_matrix[0][1], value)
+    similarities[item] = similarity
+    # print(similarity)
 
+print(similarities)
+print(sorted(similarities.items(), key=lambda x: x[1], reverse=True))
 
 # Print the TF-IDF vectors
 # for i, document in enumerate(documents):
