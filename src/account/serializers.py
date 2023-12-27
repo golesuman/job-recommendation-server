@@ -43,7 +43,7 @@ class UserInteractionSerializer:
     interactions = InteractionSerializer(many=True)
 
 
-class UserSignUpSerializer:
+class UserSignUpSerializer(serializers.Serializer):
     username = serializers.CharField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
@@ -51,37 +51,28 @@ class UserSignUpSerializer:
     confirmation_password = serializers.CharField()
     email = serializers.EmailField()
     skills = serializers.CharField()
-    bio = serializers.CharField()
-    profile_picture = serializers.ImageField(allow_null=True)
-    skills = serializers.CharField(max_length=255, allow_blank=True, allow_null=True)
-    experience = serializers.IntegerField(allow_null=True)
-    education = serializers.CharField(max_length=255, allow_blank=True, allow_null=True)
-    location = serializers.CharField(max_length=100, allow_blank=True, allow_null=True)
-    preferred_industry = serializers.CharField(
-        max_length=100, allow_blank=True, allow_null=True
-    )
-    resume = serializers.FileField(allow_null=True)
+    experience = serializers.IntegerField()
+    education = serializers.CharField()
+    location = serializers.CharField()
+    preferred_industry = serializers.CharField()
 
     @transaction.atomic
     def save(self):
         try:
             user = User.objects.create(
-                username=self.username,
-                first_name=self.first_name,
-                last_name=self.last_name,
-                password=self.password,
-                email=self.email,
+                username=self.validated_data["username"],
+                first_name=self.validated_data["first_name"],
+                last_name=self.validated_data["last_name"],
+                password=self.validated_data["password"],
+                email=self.validated_data["email"],
             )
             UserProfile.objects.create(
                 user=user,
-                bio=self.bio,
-                profile_picture=self.profile_picture,
-                skills=self.skills,
-                experience=self.experience,
-                education=self.education,
-                location=self.location,
-                preferred_industry=self.preferred_industry,
-                resume=self.resume,
+                skills=self.validated_data["skills"],
+                experience=self.validated_data["experience"],
+                education=self.validated_data["education"],
+                location=self.validated_data["location"],
+                preferred_industry=self.validated_data["preferred_industry"],
                 is_active=True,
             )
         except Exception as e:

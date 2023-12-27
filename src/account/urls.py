@@ -6,5 +6,5 @@ urlpatterns = [
     path("login/", UserLoginView.as_view(), name="user_login"),
     path("logout/", UserLogoutView.as_view(), name="user_logout"),
     path("profile/", UserProfileAPI.as_view(), name="user_profile"),
-    path("signup", UserSignUpAPI.as_views(), name="user_signup"),
+    path("signup/", UserSignUpAPI.as_view(), name="user_signup"),
 ]

@@ -77,9 +77,13 @@ class UserSignUpAPI(APIView):
     def post(self, request):
         serializer = UserSignUpSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {"data": "User Created Successfully"}, status=status.HTTP_201_CREATED
-            )
+            try:
+                serializer.save()
+                return Response(
+                    {"data": "User Created Successfully"},
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
