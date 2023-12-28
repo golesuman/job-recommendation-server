@@ -31,8 +31,12 @@ class CosineSimilarity:
 
     def calculate_idf(self, term):
         term = self.remove_special_characters(term)
+        cleaned_documents = [
+            self.remove_special_characters(document)
+            for document in list(self.documents.values())
+        ]
         num_documents_with_term = sum(
-            1 for document in list(self.documents.values()) if term in document
+            1 for document in cleaned_documents if term in document
         )
         if num_documents_with_term > 0:
             return math.log(len(self.documents) / num_documents_with_term)
@@ -40,13 +44,13 @@ class CosineSimilarity:
             return 0
 
     def fit_document(self, document):
+        tf_idf_vector = []
         terms = self.preprocess(document)
         tf = self.calculate_tf(terms)
         # print(list(self.documents.values()))
-        tf_idf_vector = [
-            tf[self.remove_special_characters(term)] * self.calculate_idf(term)
-            for term in terms
-        ]
+        for term in terms:
+            result = tf[self.remove_special_characters(term)] * self.calculate_idf(term)
+            tf_idf_vector.append(result)
         return tf_idf_vector
 
     def calculate_tfidf(self):

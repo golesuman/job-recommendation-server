@@ -33,7 +33,7 @@ class JobRecommendationServices:
         self.preprocess()
         tf_idf_matrix = self.model.calculate_tfidf()
         profile_tf_idf_vector = self.model.fit_document(
-            document=f"{profile.skills}, {profile.experience}, {profile.preferred_industry}"
+            document=f"{profile.skills}, {profile.preferred_industry}"
         )
 
         for id, value in tf_idf_matrix:
