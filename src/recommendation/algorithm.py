@@ -83,7 +83,7 @@ class CosineSimilarity:
         # Use re.sub() to replace matched special characters with an empty string
         cleaned_word = re.sub(pattern, "", word)
 
-        return cleaned_word
+        return cleaned_word.lower()
 
 
 class KNN:
