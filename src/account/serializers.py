@@ -4,6 +4,8 @@ from .models import UserProfile
 from .models import UserProfile
 from rest_framework import serializers
 from recommendation.serializers import JobDetailsSerializer, CompanySerializer
+from django.db import transaction
+from django.contrib.auth.hashers import make_password
 
 
 class InteractionSerializer(serializers.Serializer):
@@ -40,3 +42,44 @@ class UserProfileSerializer(ModelSerializer):
 class UserInteractionSerializer:
     profile = UserProfileSerializer()
     interactions = InteractionSerializer(many=True)
+
+
+class UserSignUpSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    password = serializers.CharField()
+    confirmation_password = serializers.CharField()
+    email = serializers.EmailField()
+    skills = serializers.CharField()
+    experience = serializers.IntegerField()
+    education = serializers.CharField()
+    location = serializers.CharField()
+    preferred_industry = serializers.CharField()
+
+    @transaction.atomic
+    def save(self):
+        try:
+            if (
+                self.validated_data["password"]
+                != self.validated_data["confirmation_password"]
+            ):
+                raise serializers.ValidationError("Passwords do not match")
+            user = User.objects.create(
+                username=self.validated_data["username"],
+                first_name=self.validated_data["first_name"],
+                last_name=self.validated_data["last_name"],
+                password=make_password(self.validated_data["password"]),
+                email=self.validated_data["email"],
+            )
+            UserProfile.objects.create(
+                user=user,
+                skills=self.validated_data["skills"],
+                experience=self.validated_data["experience"],
+                education=self.validated_data["education"],
+                location=self.validated_data["location"],
+                preferred_industry=self.validated_data["preferred_industry"],
+                is_active=True,
+            )
+        except Exception as e:
+            raise e
