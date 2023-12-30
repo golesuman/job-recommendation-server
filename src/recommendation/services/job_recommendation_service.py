@@ -32,15 +32,13 @@ class JobRecommendationServices:
         profile = self.profile
         self.preprocess()
         tf_idf_matrix = self.model.calculate_tfidf()
-        profile_tf_idf_vector = self.model.fit_document(
-            document=f"{profile.skills}, {profile.preferred_industry}"
-        )
+        profile_tf_idf_vector = self.model.fit_document(document=f"{profile.skills}")
 
         for id, value in tf_idf_matrix:
             tf_idf_vector = value
 
             result = self.model.cosine_similarity(tf_idf_vector, profile_tf_idf_vector)
-            if result > 0.5:  # please adjust values as your requirement
+            if result > 0.4:  # please adjust values as your requirement
                 self.results[id] = result
         return sorted(self.results.items(), key=lambda x: x[1], reverse=True)[:n]
 

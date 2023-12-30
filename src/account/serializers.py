@@ -60,6 +60,11 @@ class UserSignUpSerializer(serializers.Serializer):
     @transaction.atomic
     def save(self):
         try:
+            if (
+                self.validated_data["password"]
+                != self.validated_data["confirmation_password"]
+            ):
+                raise serializers.ValidationError("Passwords do not match")
             user = User.objects.create(
                 username=self.validated_data["username"],
                 first_name=self.validated_data["first_name"],

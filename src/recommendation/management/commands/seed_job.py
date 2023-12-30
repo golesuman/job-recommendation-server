@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 description = row.get("description")
                 skills = row.get("Key Skills")
                 job_exp = row.get("Job Experience Required")
-                category = row.get("Functional Area")
+                category = row.get("Functional Area").split(",")[0]
                 industry = row.get("Industry")
                 role_category = row.get("Role Category")
                 location = row.get("Location")
@@ -52,7 +52,7 @@ class Command(BaseCommand):
                         industry=industry,
                     )
                     # print(company)
-                if i == 20:
+                if i == 200:
                     break
 
                 i += 1

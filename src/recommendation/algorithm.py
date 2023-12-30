@@ -1,23 +1,27 @@
 import math
 import re
+import numpy as np
+from .utils.constants import STOP_WORDS
 
 
 class CosineSimilarity:
-    def __init__(self, documents) -> None:
-        # pass
+    def __init__(self, documents):
         self.results = []
         self.documents = documents
-        # return
+        self.cleaned_documents = None
 
     def get_top_n(self, n):
         sorted_result = sorted(self.results, reverse=True)
         return sorted_result[:n]
-        # pass
 
     def preprocess(self, document):
-        # Tokenization: Split the document into words (terms)
-        terms = document.lower().split()
-        return terms
+        terms = document.split(",")
+        cleaned_terms = [
+            self.remove_special_characters(term)
+            for term in terms
+            if term not in STOP_WORDS
+        ]
+        return cleaned_terms
 
     def calculate_tf(self, terms):
         tf_dict = {}
@@ -29,29 +33,41 @@ class CosineSimilarity:
             tf_dict[term] += 1 / total_terms
         return tf_dict
 
+    def clean_documents(self):
+        if self.cleaned_documents is None:
+            self.cleaned_documents = [
+                self.remove_special_characters(document)
+                for document in list(self.documents.values())
+            ]
+
     def calculate_idf(self, term):
-        term = self.remove_special_characters(term)
-        cleaned_documents = [
-            self.remove_special_characters(document)
-            for document in list(self.documents.values())
-        ]
+        term = self.remove_special_characters(term).strip().lower()
+        self.clean_documents()
         num_documents_with_term = sum(
-            1 for document in cleaned_documents if term in document
+            1 for document in self.cleaned_documents if term in document.lower()
         )
+
         if num_documents_with_term > 0:
-            return math.log(len(self.documents) / num_documents_with_term)
+            log_result = math.log(len(self.documents) / num_documents_with_term)
+            return log_result
         else:
             return 0
 
     def fit_document(self, document):
-        tf_idf_vector = []
+        # r"[,\s]+", sentence
+
         terms = self.preprocess(document)
+        # Initialize with zeros
+        tf_idf_vector = np.zeros(len(terms))
         tf = self.calculate_tf(terms)
-        # print(list(self.documents.values()))
-        for term in terms:
-            result = tf[self.remove_special_characters(term)] * self.calculate_idf(term)
-            tf_idf_vector.append(result)
-        return tf_idf_vector
+
+        for i, term in enumerate(terms):
+            term = self.remove_special_characters(term)
+            if term in tf:
+                tf_idf_vector[i] = tf[term] * self.calculate_idf(term)
+        return [value for _, value in tf.items()]
+
+        # return tf_idf_vector
 
     def calculate_tfidf(self):
         tf_idf_matrix = []
@@ -61,10 +77,17 @@ class CosineSimilarity:
         return tf_idf_matrix
 
     def dot_product(self, vector1, vector2):
-        return sum(x * y for x, y in zip(vector1, vector2))
+        len_vector1, len_vector2 = len(vector1), len(vector2)
+
+        if len_vector1 < len_vector2:
+            vector1 = np.concatenate((vector1, np.zeros(len_vector2 - len_vector1)))
+        elif len_vector2 < len_vector1:
+            vector2 = np.concatenate((vector2, np.zeros(len_vector1 - len_vector2)))
+
+        return np.dot(vector1, vector2)
 
     def magnitude(self, vector):
-        return math.sqrt(sum(x**2 for x in vector))
+        return np.linalg.norm(vector)
 
     def cosine_similarity(self, doc1, doc2):
         dot_product_value = self.dot_product(doc1, doc2)
@@ -81,23 +104,6 @@ class CosineSimilarity:
         return tf_idf_matrix
 
     def remove_special_characters(self, word):
-        # Define a regular expression pattern to match special characters
-        pattern = r"[^a-zA-Z0-9]"
-
-        # Use re.sub() to replace matched special characters with an empty string
+        pattern = r"[^\w\s]"
         cleaned_word = re.sub(pattern, "", word)
-
-        return cleaned_word.lower()
-
-
-class KNN:
-    def __init__(self) -> None:
-        pass
-
-    def distance(self):
-        pass
-
-
-class TFIDF:
-    def __init__(self) -> None:
-        pass
+        return cleaned_word

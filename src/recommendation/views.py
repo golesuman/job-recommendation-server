@@ -12,41 +12,61 @@ from recommendation.services.job_interaction_service import (
 from recommendation.serializers import CompanySerializer, JobDetailsSerializer
 from recommendation.models import Company, Job
 from recommendation.services.job_recommendation_service import JobRecommendationServices
-
+from account.models import UserProfile
+from recommendation.utils.preprocess import remove_special_characters
 
 
 class JobDetailsView(APIView):
     permission_classes = [AllowAny]
-    # authentication_classes = {}
 
     def get(self, request, *args, **kwargs):
         user_id = request.user.id
-        results = []
         job_id = self.kwargs.get("job_id")
-        if user_id:
-            interaction_type = "click"
-            create_interaction(
-                user_id=user_id, interaction_type=interaction_type, job_id=job_id
-            )
-            jobs = Job.objects.exclude(id=job_id)
-            recommendation_service = JobRecommendationServices(
-                documents=jobs, user_id=user_id
-            )
-            results = recommendation_service.get_recommendations(n=5)
 
+        # Fetch user profile skills
+        user_profile = UserProfile.objects.get(user_id=user_id)
+        user_skills = user_profile.skills.split(",") if user_profile.skills else []
+        # user_profile_skills = [skill.strip() for skill in user_profile.skills]
+
+        # Initialize an empty list to store recommendations
+        recommendations = []
+
+        # Fetch jobs based on user profile skills
+        for skill in user_skills:
+            skill = remove_special_characters(skill)
+            # Exclude the current job and filter jobs containing the skill
+            jobs = Job.objects.exclude(id=job_id).filter(
+                title__icontains=skill.strip()
+            )
+            if jobs.count() > 0:
+                # Apply recommendation algorithm on the filtered jobs
+                recommendation_service = JobRecommendationServices(
+                    documents=jobs, user_id=user_id
+                )
+                recommendations.extend(recommendation_service.get_recommendations(n=5))
+
+        # Remove duplicates from recommendations
+        unique_recommendations = list(set(recommendations))
+
+        # Fetch details for the original job
         job_details = get_job_details(job_id)
+
         if job_details:
             serializer = JobDetailsSerializer(job_details)
-            if len(results) > 0:
-                recommended_serializer = JobDetailsSerializer(results, many=True)
+            if unique_recommendations:
+                recommended_serializer = JobDetailsSerializer(
+                    unique_recommendations, many=True
+                )
                 detail_response = {
                     "job_details": serializer.data,
                     "recommendations": recommended_serializer.data,
                 }
                 return response.Response({"data": detail_response})
+
             return response.Response(
                 {"data": serializer.data}, status=status.HTTP_200_OK
             )
+
         return response.Response(
             {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
         )
@@ -82,9 +102,11 @@ class HomePageAPI(APIView):
             recommendation_service = JobRecommendationServices(
                 documents=jobs, user_id=user_id
             )
-            results = recommendation_service.get_recommendations(n=5)
+            results = recommendation_service.get_recommendations(n=20)
             recommended_serializer = JobDetailsSerializer(results, many=True)
-            return response.Response({"data" : recommended_serializer.data}, status=status.HTTP_200_OK)
+            return response.Response(
+                {"data": recommended_serializer.data}, status=status.HTTP_200_OK
+            )
         serializer = JobDetailsSerializer(instance=jobs, many=True)
         return response.Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
