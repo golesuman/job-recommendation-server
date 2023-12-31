@@ -1,23 +1,25 @@
 import csv
+import os
 import random
 import time
 from django.contrib.auth.models import User
 
 from recommendation.models import Company, Job
 from django.utils import timezone
-
+from backend_api import settings
 from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
     help = "Closes the specified poll for voting"
 
-    # def add_arguments(self, parser):
-    #     parser.add_argument("poll_ids", nargs="+", type=int)
-
     def handle(self, *args, **options):
-        csv_file_path = "/home/suman/Downloads/College-projects/job-recommendation-server/data/job_data_naukri.csv"
-        with open(csv_file_path, "r") as file:
+        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        print(settings.BASE_DIR)
+        job_data_path = os.path.join(
+            settings.BASE_DIR, "static/data/job_data_naukri.csv"
+        )
+        with open(job_data_path, "r") as file:
             reader = csv.DictReader(file)
             i = 0
             for row in reader:
@@ -56,4 +58,4 @@ class Command(BaseCommand):
                     break
 
                 i += 1
-            self.stdout.write(self.style.SUCCESS("Successfully written to db"))
+        self.stdout.write(self.style.SUCCESS("Successfully written to db"))

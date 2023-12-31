@@ -1,9 +1,12 @@
 import csv
+import os
 from django.contrib.auth.models import User
 
 from recommendation.models import Company
 
 from django.core.management.base import BaseCommand, CommandError
+
+from backend_api import settings
 
 
 class Command(BaseCommand):
@@ -13,8 +16,9 @@ class Command(BaseCommand):
     #     parser.add_argument("poll_ids", nargs="+", type=int)
 
     def handle(self, *args, **options):
-        csv_file_path = "/home/suman/Downloads/College-projects/job-recommendation-server/data/company_data.csv"
-        with open(csv_file_path, "r") as file:
+        job_data_path = os.path.join(settings.BASE_DIR, "static/data/company_data.csv")
+
+        with open(job_data_path, "r") as file:
             reader = csv.DictReader(file)
             i = 0
             for row in reader:
