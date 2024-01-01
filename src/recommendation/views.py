@@ -22,6 +22,15 @@ class JobDetailsView(APIView):
     def get(self, request, *args, **kwargs):
         user_id = request.user.id
         job_id = self.kwargs.get("job_id")
+        # Fetch details for the original job
+        job_details = get_job_details(job_id)
+
+        if job_details:
+            serializer = JobDetailsSerializer(job_details)
+        if user_id is None:
+            return response.Response(
+                {"data": serializer.data}, status=status.HTTP_200_OK
+            )
 
         # Fetch user profile skills
         user_profile = UserProfile.objects.get(user_id=user_id)
@@ -35,9 +44,7 @@ class JobDetailsView(APIView):
         for skill in user_skills:
             skill = remove_special_characters(skill)
             # Exclude the current job and filter jobs containing the skill
-            jobs = Job.objects.exclude(id=job_id).filter(
-                title__icontains=skill.strip()
-            )
+            jobs = Job.objects.exclude(id=job_id).filter(title__icontains=skill.strip())
             if jobs.count() > 0:
                 # Apply recommendation algorithm on the filtered jobs
                 recommendation_service = JobRecommendationServices(
@@ -47,25 +54,15 @@ class JobDetailsView(APIView):
 
         # Remove duplicates from recommendations
         unique_recommendations = list(set(recommendations))
-
-        # Fetch details for the original job
-        job_details = get_job_details(job_id)
-
-        if job_details:
-            serializer = JobDetailsSerializer(job_details)
-            if unique_recommendations:
-                recommended_serializer = JobDetailsSerializer(
-                    unique_recommendations, many=True
-                )
-                detail_response = {
-                    "job_details": serializer.data,
-                    "recommendations": recommended_serializer.data,
-                }
-                return response.Response({"data": detail_response})
-
-            return response.Response(
-                {"data": serializer.data}, status=status.HTTP_200_OK
+        if unique_recommendations:
+            recommended_serializer = JobDetailsSerializer(
+                unique_recommendations, many=True
             )
+            detail_response = {
+                "job_details": serializer.data,
+                "recommendations": recommended_serializer.data,
+            }
+            return response.Response({"data": detail_response})
 
         return response.Response(
             {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
