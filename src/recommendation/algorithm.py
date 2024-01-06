@@ -48,7 +48,7 @@ class CosineSimilarity:
         )
 
         if num_documents_with_term > 0:
-            log_result = math.log(len(self.documents) / num_documents_with_term)
+            log_result = 1 + math.log(len(self.documents) / num_documents_with_term)
             return log_result
         else:
             return 0
@@ -65,9 +65,9 @@ class CosineSimilarity:
             term = self.remove_special_characters(term)
             if term in tf:
                 tf_idf_vector[i] = tf[term] * self.calculate_idf(term)
-        return [value for _, value in tf.items()]
+        # return [value for _, value in tf.items()]
 
-        # return tf_idf_vector
+        return tf_idf_vector
 
     def calculate_tfidf(self):
         tf_idf_matrix = []
