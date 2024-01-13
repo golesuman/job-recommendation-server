@@ -63,6 +63,10 @@ class JobDetailsView(APIView):
                 "recommendations": recommended_serializer.data,
             }
             return response.Response({"data": detail_response})
+        elif not len(unique_recommendations) == 0:
+            return response.Response(
+                {"data": serializer.data}, status=status.HTTP_200_OK
+            )
 
         return response.Response(
             {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
