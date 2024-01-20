@@ -12,7 +12,7 @@ from recommendation.services.job_interaction_service import (
 from recommendation.serializers import CompanySerializer, JobDetailsSerializer
 from recommendation.models import Company, Job
 from recommendation.services.job_recommendation_service import JobRecommendationServices
-from account.models import UserProfile
+from account.models import Interaction, UserProfile
 from recommendation.utils.preprocess import remove_special_characters
 
 
@@ -42,25 +42,39 @@ class JobDetailsView(APIView):
                 {"data": serializer.data}, status=status.HTTP_200_OK
             )
 
-        # Fetch user profile skills
-        user_profile = UserProfile.objects.get(user_id=user_id)
-        user_skills = user_profile.skills.split(",") if user_profile.skills else []
-        # user_profile_skills = [skill.strip() for skill in user_profile.skills]
-
         # Initialize an empty list to store recommendations
         recommendations = []
 
         # Fetch jobs based on user profile skills
-        for skill in user_skills:
-            skill = remove_special_characters(skill)
-            # Exclude the current job and filter jobs containing the skill
-            jobs = Job.objects.exclude(id=job_id).filter(title__icontains=skill.strip())
-            if jobs.count() > 0:
-                # Apply recommendation algorithm on the filtered jobs
-                recommendation_service = JobRecommendationServices(
-                    documents=jobs, user_id=user_id
+        interaction_data = Interaction.objects.filter(user=request.user)
+
+        if interaction_data.count() > 10:
+            jobs = Job.objects.exclude(id=job_id)
+
+            recommendation_service = JobRecommendationServices(
+                documents=jobs, user_id=user_id, interaction=interaction_data
+            )
+            recommendations.extend(
+                recommendation_service.get_recommendations(n=5, model="pearson")
+            )
+        else:
+            # Fetch user profile skills
+            user_profile = UserProfile.objects.get(user_id=user_id)
+            user_skills = user_profile.skills.split(",") if user_profile.skills else []
+            for skill in user_skills:
+                skill = remove_special_characters(skill)
+                # Exclude the current job and filter jobs containing the skill
+                jobs = Job.objects.exclude(id=job_id).filter(
+                    title__icontains=skill.strip()
                 )
-                recommendations.extend(recommendation_service.get_recommendations(n=5))
+                if jobs.count() > 0:
+                    # Apply recommendation algorithm on the filtered jobs
+                    recommendation_service = JobRecommendationServices(
+                        documents=jobs, user_id=user_id, interaction=None
+                    )
+                    recommendations.extend(
+                        recommendation_service.get_recommendations(n=5)
+                    )
 
         # Remove duplicates from recommendations
         unique_recommendations = list(set(recommendations))
@@ -111,7 +125,7 @@ class JobsPageAPI(APIView):
         jobs = Job.objects.all()
         if user_id is not None:
             recommendation_service = JobRecommendationServices(
-                documents=jobs, user_id=user_id
+                documents=jobs, user_id=user_id, interaction=None
             )
             results = recommendation_service.get_recommendations(n=20)
             recommended_serializer = JobDetailsSerializer(results, many=True)

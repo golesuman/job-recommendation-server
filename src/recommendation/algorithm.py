@@ -55,7 +55,9 @@ class PearsonCorrelation:
         var_x = np.sum((vector1 - mean_x) ** 2)
         var_y = np.sum((vector2 - mean_y) ** 2)
 
-        correlation_coefficient = covariance / (np.sqrt(var_x) * np.sqrt(var_y))
+        correlation_coefficient = np.divide(
+            covariance, (np.sqrt(var_x) * np.sqrt(var_y))
+        )
 
         return correlation_coefficient
 

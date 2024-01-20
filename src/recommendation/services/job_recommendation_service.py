@@ -20,9 +20,10 @@ class JobRecommendationServices:
         self.preprocess_interaction()
 
     def preprocess_interaction(self):
-        for document in self.interaction:
-            data = f"{document.job.title}"
-            self.preprocessed_interaction[id] = data
+        if self.interaction:
+            for document in self.interaction:
+                data = f"{document.job.title}"
+                self.preprocessed_interaction[id] = data
 
     def preprocess(self):
         for document in self.documents:
