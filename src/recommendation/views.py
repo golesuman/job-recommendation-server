@@ -16,6 +16,16 @@ from account.models import UserProfile
 from recommendation.utils.preprocess import remove_special_characters
 
 
+class HomePageAPI(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.user.id
+        if user_id is None:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(status=status.HTTP_200_OK)
+
+
 class JobDetailsView(APIView):
     permission_classes = [AllowAny]
 
@@ -93,7 +103,7 @@ class JobApplyView(APIView):
         )
 
 
-class HomePageAPI(APIView):
+class JobsPageAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):

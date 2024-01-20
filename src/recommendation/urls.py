@@ -6,13 +6,15 @@ from recommendation.views import (
     HomePageAPI,
     JobDetailsView,
     JobApplyView,
+    JobsPageAPI,
 )
 
 urlpatterns = [
-    path("job/<int:job_id>/", JobDetailsView.as_view(), name="job_details"),
+    path("job/<int:job_id>", JobDetailsView.as_view(), name="job_details"),
     path("job", JobApplyView.as_view(), name="apply_job"),
-    path("jobs", HomePageAPI.as_view(), name="list_all_jobs"),
+    path("jobs", JobsPageAPI.as_view(), name="list_all_jobs"),
     path(
         "company/<int:company_id>", CompanyDetailsAPI.as_view(), name="company_details"
     ),
+    path("home", HomePageAPI.as_view(), name="home_page"),
 ]
