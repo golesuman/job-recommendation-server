@@ -94,7 +94,9 @@ class TFIDF:
         )
 
         if num_documents_with_term > 0:
-            log_result = 1 + math.log(len(self.documents) / num_documents_with_term)
+            log_result = 1 + math.log(
+                len(self.documents) / num_documents_with_term
+            )  # 1 is added for smoothing
             return log_result
         else:
             return 0
@@ -116,8 +118,6 @@ class TFIDF:
             term = self.remove_special_characters(term)
             if term in tf:
                 tf_idf_vector[i] = tf[term] * self.calculate_idf(term)
-        # return [value for _, value in tf.items()]
-
         return tf_idf_vector
 
     def preprocess(self, document):

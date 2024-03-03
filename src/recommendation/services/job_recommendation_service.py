@@ -73,6 +73,6 @@ class JobRecommendationServices:
 
         return sorted(self.results.items(), key=lambda x: x[1], reverse=True)[:n]
 
-    def get_recommendations(self, n, model="cosine"):
+    def get_recommendations(self, n, model="cosine"):  # model is cosine by default
         scores = self.get_similarity_scores(n, model)
         return Job.objects.filter(id__in=[score[0] for score in scores])

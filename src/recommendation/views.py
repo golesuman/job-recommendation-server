@@ -16,14 +16,25 @@ from account.models import Interaction, UserProfile
 from recommendation.utils.preprocess import remove_special_characters
 
 
+INTERACTION_LIMIT = 10
+
+
 class HomePageAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
         user_id = request.user.id
-        if user_id is None:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
-        return response.Response(status=status.HTTP_200_OK)
+        jobs = Job.objects.all()
+        if user_id is not None:
+            recommendation_service = JobRecommendationServices(
+                documents=jobs, user_id=user_id, interaction=None
+            )
+            results = recommendation_service.get_recommendations(n=10)
+            recommended_serializer = JobDetailsSerializer(results, many=True)
+            return response.Response(
+                {"data": recommended_serializer.data}, status=status.HTTP_200_OK
+            )
+        return response.Response({"data": None}, status=status.HTTP_200_OK)
 
 
 class JobDetailsView(APIView):
@@ -48,7 +59,7 @@ class JobDetailsView(APIView):
         # Fetch jobs based on user profile skills
         interaction_data = Interaction.objects.filter(user=request.user)
 
-        if interaction_data.count() > 10:
+        if interaction_data.count() > INTERACTION_LIMIT:
             jobs = Job.objects.exclude(id=job_id)
 
             recommendation_service = JobRecommendationServices(
@@ -76,7 +87,6 @@ class JobDetailsView(APIView):
                         recommendation_service.get_recommendations(n=5)
                     )
 
-        # Remove duplicates from recommendations
         unique_recommendations = list(set(recommendations))
         if unique_recommendations:
             recommended_serializer = JobDetailsSerializer(
