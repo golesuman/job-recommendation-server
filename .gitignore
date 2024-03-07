@@ -439,3 +439,5 @@ modules.xml
 /.idea
 *.idea
 \*.idea
+*.sqlite3
+*.db
