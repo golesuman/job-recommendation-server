@@ -22,4 +22,4 @@ class PreProcessing:
 
 def remove_special_characters(word):
     cleaned_word = re.sub(r"[^a-zA-Z0-9\s]", "", word)
-    return cleaned_word
+    return cleaned_word.lower()

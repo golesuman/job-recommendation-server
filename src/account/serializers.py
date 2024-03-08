@@ -57,14 +57,21 @@ class UserSignUpSerializer(serializers.Serializer):
     location = serializers.CharField()
     preferred_industry = serializers.CharField()
 
+    def validate(self, data):
+        if data.get("password") != data.get("confirmation_password"):
+            raise serializers.ValidationError("Passwords do not match")
+
+        if User.objects.filter(email=data.get("email")).exists():
+            raise serializers.ValidationError("Email is already in use")
+
+        if User.objects.filter(username=data.get("username")).exists():
+            raise serializers.ValidationError("Username is already taken")
+
+        return data
+
     @transaction.atomic
     def save(self):
         try:
-            if (
-                self.validated_data["password"]
-                != self.validated_data["confirmation_password"]
-            ):
-                raise serializers.ValidationError("Passwords do not match")
             user = User.objects.create(
                 username=self.validated_data["username"],
                 first_name=self.validated_data["first_name"],
