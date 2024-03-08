@@ -41,72 +41,82 @@ class JobDetailsView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        user_id = request.user.id
-        job_id = self.kwargs.get("job_id")
-        # Fetch details for the original job
-        job_details = get_job_details(job_id)
+        try:
+            user_id = request.user.id
+            job_id = self.kwargs.get("job_id")
+            # Fetch details for the original job
+            job_details = get_job_details(job_id)
 
-        if job_details:
-            serializer = JobDetailsSerializer(job_details)
-        if user_id is None:
-            return response.Response(
-                {"data": serializer.data}, status=status.HTTP_200_OK
-            )
-
-        # Initialize an empty list to store recommendations
-        recommendations = []
-
-        # Fetch jobs based on user profile skills
-        interaction_data = Interaction.objects.filter(user=request.user)
-
-        if interaction_data.count() > INTERACTION_LIMIT:
-            jobs = Job.objects.exclude(id=job_id)
-
-            recommendation_service = JobRecommendationServices(
-                documents=jobs, user_id=user_id, interaction=interaction_data
-            )
-            recommendations.extend(
-                recommendation_service.get_recommendations(n=5, model="pearson")
-            )
-        else:
-            # Fetch user profile skills
-            user_profile = UserProfile.objects.get(user_id=user_id)
-            user_skills = user_profile.skills.split(",") if user_profile.skills else []
-            for skill in user_skills:
-                skill = remove_special_characters(skill)
-                # Exclude the current job and filter jobs containing the skill
-                jobs = Job.objects.exclude(id=job_id).filter(
-                    title__icontains=skill.strip()
+            if job_details:
+                serializer = JobDetailsSerializer(job_details)
+            if user_id is None:
+                return response.Response(
+                    {"data": serializer.data}, status=status.HTTP_200_OK
                 )
-                if jobs.count() > 0:
-                    # Apply recommendation algorithm on the filtered jobs
-                    recommendation_service = JobRecommendationServices(
-                        documents=jobs, user_id=user_id, interaction=None
-                    )
-                    recommendations.extend(
-                        recommendation_service.get_recommendations(n=5)
-                    )
 
-        unique_recommendations = list(set(recommendations))
+            create_interaction(user_id=user_id, job_id=job_id, interaction_type="click")
 
-        if unique_recommendations:
-            recommended_serializer = JobDetailsSerializer(
-                unique_recommendations, many=True
-            )
-            detail_response = {
-                "job_details": serializer.data,
-                "recommendations": recommended_serializer.data,
-            }
-            return response.Response({"data": detail_response})
-        
-        elif not len(unique_recommendations) == 0:
+            # Initialize an empty list to store recommendations
+            recommendations = []
+
+            # Fetch jobs based on user profile skills
+            interaction_data = Interaction.objects.filter(user=request.user)
+
+            if interaction_data.count() > INTERACTION_LIMIT:
+                jobs = Job.objects.exclude(id=job_id)
+
+                recommendation_service = JobRecommendationServices(
+                    documents=jobs, user_id=user_id, interaction=interaction_data
+                )
+                recommendations.extend(
+                    recommendation_service.get_recommendations(n=5, model="pearson")
+                )
+            else:
+                # Fetch user profile skills
+                user_profile = UserProfile.objects.get(user_id=user_id)
+                user_skills = (
+                    user_profile.skills.split(",") if user_profile.skills else []
+                )
+                for skill in user_skills:
+                    skill = remove_special_characters(skill)
+                    # Exclude the current job and filter jobs containing the skill
+                    jobs = Job.objects.exclude(id=job_id).filter(
+                        title__icontains=skill.strip()
+                    )
+                    if jobs.count() > 0:
+                        # Apply recommendation algorithm on the filtered jobs
+                        recommendation_service = JobRecommendationServices(
+                            documents=jobs, user_id=user_id, interaction=None
+                        )
+                        recommendations.extend(
+                            recommendation_service.get_recommendations(n=5)
+                        )
+
+            unique_recommendations = list(set(recommendations))
+
+            if unique_recommendations:
+                recommended_serializer = JobDetailsSerializer(
+                    unique_recommendations, many=True
+                )
+                detail_response = {
+                    "job_details": serializer.data,
+                    "recommendations": recommended_serializer.data,
+                }
+                return response.Response({"data": detail_response})
+
+            elif len(unique_recommendations) == 0:
+                return response.Response(
+                    {"data": serializer.data}, status=status.HTTP_200_OK
+                )
+
             return response.Response(
-                {"data": serializer.data}, status=status.HTTP_200_OK
+                {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
             )
-
-        return response.Response(
-            {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
-        )
+        except Exception as e:
+            return response.Response(
+                {"data": "Internal Server Error"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class JobApplyView(APIView):

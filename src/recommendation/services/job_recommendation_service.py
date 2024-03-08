@@ -15,15 +15,16 @@ class JobRecommendationServices:
         self.pearson = PearsonCorrelation()
         self.tfidf = TFIDF(self.preprocessed_documents)
         self.interaction = interaction
-        self.preprocessed_interaction = defaultdict()
+        self.preprocessed_interaction = {}
         self.preprocess()
         self.preprocess_interaction()
 
     def preprocess_interaction(self):
         if self.interaction:
             for document in self.interaction:
+                id_ = document.job.id
                 data = f"{document.job.title}"
-                self.preprocessed_interaction[id] = data
+                self.preprocessed_interaction[id_] = data
 
     def preprocess(self):
         for document in self.documents:

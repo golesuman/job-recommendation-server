@@ -135,6 +135,9 @@ class PearsonCorrelation:
         covariance = np.sum((vector1 - mean_x) * (vector2 - mean_y))
         var_x = np.sum((vector1 - mean_x) ** 2)
         var_y = np.sum((vector2 - mean_y) ** 2)
+        
+        if int(covariance) == 0:
+            return 0
 
         correlation_coefficient = np.divide(
             covariance, (np.sqrt(var_x) * np.sqrt(var_y))
@@ -203,7 +206,7 @@ class TFIDF:
         return tf_idf_vector
 
     def preprocess(self, document):
-        terms = document.split(",")
+        terms = re.split(r'[,\s]+', document)
         cleaned_terms = [
             self.stemmer.stem(self.remove_special_characters(term))
             for term in terms
