@@ -88,6 +88,7 @@ class JobDetailsView(APIView):
                     )
 
         unique_recommendations = list(set(recommendations))
+
         if unique_recommendations:
             recommended_serializer = JobDetailsSerializer(
                 unique_recommendations, many=True
@@ -97,6 +98,7 @@ class JobDetailsView(APIView):
                 "recommendations": recommended_serializer.data,
             }
             return response.Response({"data": detail_response})
+        
         elif not len(unique_recommendations) == 0:
             return response.Response(
                 {"data": serializer.data}, status=status.HTTP_200_OK

@@ -4,6 +4,87 @@ import numpy as np
 from .utils.constants import STOP_WORDS
 
 
+class PorterStemmer:
+    def stem(self, word):
+        """
+        Apply the Porter Stemmer algorithm to a word and return the stemmed word.
+        """
+        # Step 1a
+        if word.endswith("sses"):
+            word = word[:-2]
+        elif word.endswith("ies"):
+            word = word[:-2]
+        elif word.endswith("ss"):
+            pass
+        elif word.endswith("s"):
+            word = word[:-1]
+
+        # Step 1b
+        if word.endswith("eed"):
+            if len(re.findall(r"[aeiou]", word[:-3])) > 0:
+                word = word[:-1]
+        elif re.search(r"([aeiou].*?)(ed|ing)$", word):
+            stem = re.sub(r"([aeiou].*?)(ed|ing)$", r"\1", word)
+            if re.search(r"[aeiou]", stem):
+                word = stem
+                if word.endswith("at") or word.endswith("bl") or word.endswith("iz"):
+                    word += "e"
+                elif len(re.findall(r"[^aeiou]([aeiou][^aeioulsz])$", word)) == 1:
+                    word = word[:-1]
+                elif len(re.findall(r"([aeiou][^aeioulsz])$", word)) == 1:
+                    word += "e"
+
+        # Step 1c
+        if re.search(r"([aeiou][^aeiou])y$", word):
+            word = re.sub(r"([aeiou][^aeiou])y$", r"\1i", word)
+
+        # Step 2
+        if len(word) > 1:
+            word = re.sub(
+                r"(ational|tional|enci|anci|izer|bli|alli|entli|eli|ousli|ization|ation|ator|alism|iveness|fulness|ousness|aliti|iviti|biliti)$",
+                r"\1",
+                word,
+            )
+            if re.search(r"(alli|ousli|fulli|entli)$", word):
+                word = word[:-2]
+            elif re.search(
+                r"(ational|tional|alize|icate|iciti|ative|ical|ness|ful)$", word
+            ):
+                word = word[:-4]
+            elif re.search(r"(ic|ative|al|ive)$", word):
+                word = word[:-3]
+
+        # Step 3
+        if len(word) > 1:
+            word = re.sub(r"ness$", "", word)
+            if re.search(
+                r"(ational|tional|ate|iciti|ical|ance|ence|ize|ive|ous|ful)$", word
+            ):
+                word = word[:-4]
+
+        # Step 4
+        if len(word) > 1:
+            if re.search(
+                r"(ement|ment|able|ible|ance|ence|ate|iti|ion|al|er|ic|ou|ive)$", word
+            ):
+                word = word[:-3]
+            elif re.search(r"(ant|ent|ism|ate|iti|ous|ive|ize)$", word):
+                word = word[:-2]
+            elif re.search(r"e$", word):
+                if len(word) > 2 or len(re.findall(r"[aeiou]", word[:-1])) > 1:
+                    word = word[:-1]
+
+        # Step 5a
+        if re.search(r"[aeiou].*([st])$", word):
+            word = word[:-1]
+
+        # Step 5b
+        if len(re.findall(r"[aeiou].*[aeiou].*[lsz]$", word)) > 1:
+            word = word[:-1]
+
+        return word
+
+
 class CosineSimilarity:
     def __init__(self):
         self.results = []
@@ -66,6 +147,7 @@ class TFIDF:
     def __init__(self, documents) -> None:
         self.documents = documents
         self.cleaned_documents = None
+        self.stemmer = PorterStemmer()
 
     def get_tf_idf_matrix(self):
         tf_idf_matrix = self.calculate_tfidf()
@@ -123,7 +205,7 @@ class TFIDF:
     def preprocess(self, document):
         terms = document.split(",")
         cleaned_terms = [
-            self.remove_special_characters(term)
+            self.stemmer.stem(self.remove_special_characters(term))
             for term in terms
             if term not in STOP_WORDS
         ]
