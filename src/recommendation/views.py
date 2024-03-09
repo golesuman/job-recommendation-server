@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
@@ -91,37 +92,28 @@ class JobDetailsView(APIView):
             recommendations = []
 
             # Fetch jobs based on user profile skills
-            interaction_data = Interaction.objects.filter(user=request.user)
 
-            if interaction_data.count() > INTERACTION_LIMIT:
-                jobs = Job.objects.exclude(id=job_id)
+            # Fetch user profile skills
+            job_skills = (
+                re.split(r"[\s,|]+", job_details.skills) if job_details.skills else []
+            )
 
-                recommendation_service = JobRecommendationServices(
-                    documents=jobs, user_id=user_id, interaction=interaction_data
+            for skill in [skill for skill in job_skills if skill != ""]:
+                skill = remove_special_characters(skill)
+                # Exclude the current job and filter jobs containing the skill
+                jobs = Job.objects.exclude(id=job_id).filter(
+                    title__icontains=skill.strip()
                 )
-                recommendations.extend(
-                    recommendation_service.get_recommendations(n=5, model="pearson")
-                )
-            else:
-                # Fetch user profile skills
-                user_profile = UserProfile.objects.get(user_id=user_id)
-                user_skills = (
-                    user_profile.skills.split(",") if user_profile.skills else []
-                )
-                for skill in user_skills:
-                    skill = remove_special_characters(skill)
-                    # Exclude the current job and filter jobs containing the skill
-                    jobs = Job.objects.exclude(id=job_id).filter(
-                        title__icontains=skill.strip()
+                if jobs.count() > 0:
+                    # Apply recommendation algorithm on the filtered jobs
+                    recommendation_service = JobRecommendationServices(
+                        documents=jobs,
+                        job_details=job_details,
+                        interaction=None,
                     )
-                    if jobs.count() > 0:
-                        # Apply recommendation algorithm on the filtered jobs
-                        recommendation_service = JobRecommendationServices(
-                            documents=jobs, user_id=user_id, interaction=None
-                        )
-                        recommendations.extend(
-                            recommendation_service.get_recommendations(n=5)
-                        )
+                    recommendations.extend(
+                        recommendation_service.get_recommendations(n=5)
+                    )
 
             unique_recommendations = list(set(recommendations))
 

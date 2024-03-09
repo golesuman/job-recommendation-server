@@ -4,18 +4,24 @@ from ..algorithm import TFIDF, CosineSimilarity, PearsonCorrelation
 from account.models import UserProfile
 
 
+DEFAULT_THRESHOLD = 0.4
+
+
 class JobRecommendationServices:
-    def __init__(self, documents, user_id, interaction) -> None:
-        self.profile = UserProfile.objects.get(user_id=user_id)
+    def __init__(
+        self, documents, user_id=None, interaction=None, job_details=None
+    ) -> None:
         self.documents = documents
         self.preprocessed_documents = defaultdict()
         self.results = {}
+        self.user_id = user_id
         self.model = None
         self.cosine = CosineSimilarity()
         self.pearson = PearsonCorrelation()
         self.tfidf = TFIDF(self.preprocessed_documents)
         self.interaction = interaction
         self.preprocessed_interaction = {}
+        self.job_details = job_details
         self.preprocess()
         self.preprocess_interaction()
 
@@ -31,12 +37,7 @@ class JobRecommendationServices:
             id = document.id
             title = document.title
             description = document.description
-            # job_type = document.job_type
-            # location = document.location
-            industry = document.industry
-            category = document.category
-            salary = document.skills
-            data = f"{title}"
+            data = f"{title}, {description}"
 
             # ]
 
@@ -48,13 +49,20 @@ class JobRecommendationServices:
         if model == "cosine":
             for id, value in tf_idf_matrix:
                 tf_idf_vector = value
-                profile = self.profile
-                profile_tf_idf_vector = self.tfidf.fit_document(
-                    document=f"{profile.skills}"
-                )
-                result = self.cosine.cosine_similarity(
-                    tf_idf_vector, profile_tf_idf_vector
-                )
+
+                if self.job_details:
+                    job_idf_vector = self.tfidf.fit_document(self.job_details.skills)
+                    result = self.cosine.cosine_similarity(
+                        tf_idf_vector, job_idf_vector
+                    )
+                if self.user_id is not None:
+                    profile = UserProfile.objects.get(user=self.user_id)
+                    profile_tf_idf_vector = self.tfidf.fit_document(
+                        document=f"{profile.skills}"
+                    )
+                    result = self.cosine.cosine_similarity(
+                        tf_idf_vector, profile_tf_idf_vector
+                    )
                 if result > 0.4:  # please adjust values as your requirement
                     self.results[id] = result
         else:
@@ -66,7 +74,9 @@ class JobRecommendationServices:
                 ) in self.preprocessed_interaction.items():
                     job_vector = self.tfidf.fit_document(document=f"{interaction}")
                     result = self.pearson.pearson_correlation(tf_idf_vector, job_vector)
-                    if result > 0.4:  # please adjust values as your requirement
+                    if (
+                        result > DEFAULT_THRESHOLD
+                    ):  # please adjust values as your requirement
                         if self.results.get(id):
                             self.results[id] += (result + self.results.get(id)) / 2
                         else:
