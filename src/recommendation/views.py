@@ -26,14 +26,45 @@ class HomePageAPI(APIView):
         user_id = request.user.id
         jobs = Job.objects.all()
         if user_id is not None:
-            recommendation_service = JobRecommendationServices(
-                documents=jobs, user_id=user_id, interaction=None
-            )
-            results = recommendation_service.get_recommendations(n=10)
-            recommended_serializer = JobDetailsSerializer(results, many=True)
-            return response.Response(
-                {"data": recommended_serializer.data}, status=status.HTTP_200_OK
-            )
+            recommendations = []
+            jobs = Job.objects.all()
+            # Fetch jobs based on user profile skills
+            interaction_data = Interaction.objects.filter(user=request.user)
+
+            if interaction_data.count() > INTERACTION_LIMIT:
+                recommendation_service = JobRecommendationServices(
+                    documents=jobs, user_id=user_id, interaction=interaction_data
+                )
+                recommendations.extend(
+                    recommendation_service.get_recommendations(n=5, model="pearson")
+                )
+            else:
+                user_profile = UserProfile.objects.get(user_id=user_id)
+
+                user_skills = (
+                    user_profile.skills.split(",") if user_profile.skills else []
+                )
+                for skill in user_skills:
+                    skill = remove_special_characters(skill)
+
+                    if jobs.count() > 0:
+                        # Apply recommendation algorithm on the filtered jobs
+                        recommendation_service = JobRecommendationServices(
+                            documents=jobs, user_id=user_id, interaction=None
+                        )
+                        recommendations.extend(
+                            recommendation_service.get_recommendations(n=5)
+                        )
+
+            unique_recommendations = list(set(recommendations))
+
+            if unique_recommendations:
+                recommended_serializer = JobDetailsSerializer(
+                    unique_recommendations, many=True
+                )
+                return response.Response(
+                    {"data": recommended_serializer.data}, status=status.HTTP_200_OK
+                )
         return response.Response({"data": None}, status=status.HTTP_200_OK)
 
 
