@@ -37,7 +37,7 @@ class JobRecommendationServices:
             id = document.id
             title = document.title
             description = document.description
-            data = f"{title}, {description}"
+            data = f"{title}"
 
             # ]
 
@@ -63,7 +63,9 @@ class JobRecommendationServices:
                     result = self.cosine.cosine_similarity(
                         tf_idf_vector, profile_tf_idf_vector
                     )
-                if result > 0.4:  # please adjust values as your requirement
+                if (
+                    result > DEFAULT_THRESHOLD
+                ):  # please adjust values as your requirement
                     self.results[id] = result
         else:
             for id, value in tf_idf_matrix:

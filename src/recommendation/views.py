@@ -97,7 +97,7 @@ class JobDetailsView(APIView):
             job_skills = (
                 re.split(r"[\s,|]+", job_details.skills) if job_details.skills else []
             )
-
+            # jobs = Job.objects.exclude(id=job_)
             for skill in [skill for skill in job_skills if skill != ""]:
                 skill = remove_special_characters(skill)
                 # Exclude the current job and filter jobs containing the skill
@@ -112,7 +112,7 @@ class JobDetailsView(APIView):
                         interaction=None,
                     )
                     recommendations.extend(
-                        recommendation_service.get_recommendations(n=5)
+                        recommendation_service.get_recommendations(n=3)
                     )
 
             unique_recommendations = list(set(recommendations))
@@ -137,7 +137,7 @@ class JobDetailsView(APIView):
             )
         except Exception as e:
             return response.Response(
-                {"data": "Internal Server Error"},
+                {"data": f"Internal Server Error {e}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
