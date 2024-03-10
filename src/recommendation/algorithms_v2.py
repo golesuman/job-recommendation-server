@@ -2,6 +2,11 @@ import math
 import re
 import numpy as np
 
+
+from .algorithm import PorterStemmer
+
+stemmer = PorterStemmer()
+
 STOP_WORDS = set(["the", "and", "is", "in", "it", "to", "of", "this", "that", "for"])
 
 
@@ -40,7 +45,7 @@ def calculate_idf(term, cleaned_documents):
 def preprocess(document):
     terms = re.split(r"[,\s]+", document)
     cleaned_terms = [
-        remove_special_characters(term).lower()
+        stemmer.stem(remove_special_characters(term).lower())
         for term in terms
         if term.lower() not in STOP_WORDS
     ]

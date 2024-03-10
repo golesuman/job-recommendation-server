@@ -4,7 +4,7 @@ from .models import Job
 from account.models import Interaction, UserProfile
 
 from .serializers import JobPostSerializer
-from .recommendations_alt import get_recommendations
+from .algorithms_v2 import get_recommendations
 
 
 INTERACTION_LIMIT = 10
