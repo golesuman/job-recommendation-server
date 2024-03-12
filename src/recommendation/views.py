@@ -43,9 +43,7 @@ class JobDetailsView(APIView):
             # Initialize an empty list to store recommendations
             recommendations = []
 
-            # Fetch jobs based on user profile skills
 
-            # Fetch user profile skills
             job_skills = (
                 re.split(r"[\s,|]+", job_details.skills) if job_details.skills else []
             )

@@ -5,3 +5,7 @@ psycopg2-binary==2.9.9
 djangorestframework==3.14.0
 pip-tools==7.3.0
 django-cors-headers==4.2.0
+pytest
+factory_boy
+numpy
+pytest_django

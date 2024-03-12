@@ -7,7 +7,9 @@ from .algorithm import PorterStemmer
 
 stemmer = PorterStemmer()
 
-STOP_WORDS = set(["the", "and", "is", "in", "it", "to", "of", "this", "that", "for"])
+STOP_WORDS = set(
+    ["the", "and", "is", "in", "it", "to", "of", "this", "that", "for", "a"]
+)
 
 
 def remove_special_characters(word):
