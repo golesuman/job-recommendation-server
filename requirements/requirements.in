@@ -8,4 +8,5 @@ django-cors-headers==4.2.0
 pytest
 factory_boy
 numpy
+django-jazzmin
 pytest_django
