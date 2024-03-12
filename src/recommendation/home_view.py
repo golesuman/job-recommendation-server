@@ -44,7 +44,7 @@ class RecommendationView(views.APIView):
                 model="cosine", job_listings_dict=job_listings_dict, data=profile_
             )
 
-        jobs = Job.objects.filter(id__in=job_ids)
+        jobs = job_listings.filter(id__in=job_ids)
         serializer = JobPostSerializer(jobs, many=True)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
