@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .models import Job
 from account.models import Interaction, UserProfile
 
-from .serializers import JobPostSerializer
+from .serializers import JobDetailsSerializer, JobPostSerializer
 from .algorithms_v2 import get_recommendations
 
 
@@ -45,7 +45,7 @@ class RecommendationView(views.APIView):
             )
 
         jobs = job_listings.filter(id__in=job_ids)
-        serializer = JobPostSerializer(jobs, many=True)
+        serializer = JobDetailsSerializer(jobs, many=True)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
     def get_results(self, model, data, job_listings_dict):
