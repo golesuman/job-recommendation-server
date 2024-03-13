@@ -16,11 +16,11 @@ class Company(models.Model):
 
 class Job(models.Model):
     company = models.ForeignKey(to=Company, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100, null=True)
+    title = models.CharField(max_length=255, null=True)
     description = models.TextField(null=True)
-    location = models.CharField(max_length=100, null=True)
+    location = models.CharField(max_length=255, null=True)
     job_type = models.CharField(
-        max_length=20,
+        max_length=255,
         choices=[
             ("Full-Time", "Full-Time"),
             ("Part-Time", "Part-Time"),
@@ -29,14 +29,14 @@ class Job(models.Model):
         ],
         default="Full-Time",
     )
-    industry = models.CharField(max_length=100, null=True)
-    experience = models.CharField(max_length=300)
-    skills = models.CharField(max_length=300)
+    industry = models.CharField(max_length=255, null=True)
+    experience = models.CharField(max_length=1000)
+    skills = models.CharField(max_length=1000)
     role = models.CharField(max_length=255)
-    category = models.CharField(max_length=50, default="Entry-Level")
-    salary = models.CharField(null=True, blank=True, max_length=200)
+    category = models.CharField(max_length=255, default="Entry-Level")
+    salary = models.CharField(null=True, blank=True, max_length=255)
     posted_at = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(blank=True, null=True, max_length=100)
+    slug = models.SlugField(blank=True, null=True, max_length=255)
     expires_at = models.DateTimeField(null=True)
     is_active = models.BooleanField(default=True)
 

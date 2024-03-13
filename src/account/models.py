@@ -2,6 +2,7 @@ from collections.abc import Iterable
 import os
 from django.db import models
 import uuid
+
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
@@ -14,9 +15,9 @@ INTERACTION_TYPE = (("click", "click"), ("apply", "apply"))
 
 
 def get_file_path(instance, filename):
-    ext = filename.split('.')[-1]
+    ext = filename.split(".")[-1]
     filename = f"{uuid.uuid4()}.{ext}"
-    return os.path.join('profile', filename)
+    return os.path.join("profile", filename)
 
 
 class UserProfile(models.Model):
@@ -28,7 +29,9 @@ class UserProfile(models.Model):
     education = models.CharField(max_length=255, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
     preferred_industry = models.CharField(max_length=100, blank=True, null=True)
-    resume = models.FileField(upload_to="resumes/", blank=True, null=True)
+    resume = models.FileField(
+        upload_to="resumes/", blank=True, null=True, max_length=200
+    )
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
