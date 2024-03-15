@@ -11,6 +11,9 @@ INTERACTION_LIMIT = 10
 THRESHOLD = 0.3
 
 
+CACHE = {}
+
+
 class RecommendationView(views.APIView):
     def get(self, request, format=None):
         user_id = request.user.id
@@ -18,35 +21,37 @@ class RecommendationView(views.APIView):
         if not user_id:
             return Response({"data": None}, status=status.HTTP_200_OK)
 
-        interactions = Interaction.objects.filter(user_id=user_id)
-        user_profile = UserProfile.objects.filter(user_id=user_id).first()
-        job_listings = Job.objects.all()
-        job_listings_dict = {
-            str(job.id): job.title + "," + job.description for job in job_listings
-        }
+        if CACHE.get(user_id) is None:
+            interactions = Interaction.objects.filter(user_id=user_id)
+            user_profile = UserProfile.objects.filter(user_id=user_id).first()
+            job_listings = Job.objects.all()
+            job_listings_dict = {
+                str(job.id): job.title + "," + job.description for job in job_listings
+            }
 
-        if interactions.count() > INTERACTION_LIMIT:
-            interaction_history = [
-                interaction.job.title + "," + interaction.job.description
-                for interaction in interactions
-            ]
-            job_ids = self.get_results(
-                model="cosine",
-                job_listings_dict=job_listings_dict,
-                data=interaction_history,
-            )
-
-        else:
-            if user_profile.skills:
-                skills = user_profile.skills
+            if interactions.count() > INTERACTION_LIMIT:
+                interaction_history = [
+                    interaction.job.title + "," + interaction.job.description
+                    for interaction in interactions
+                ]
                 job_ids = self.get_results(
-                    model="cosine", job_listings_dict=job_listings_dict, data=skills
+                    model="cosine",
+                    job_listings_dict=job_listings_dict,
+                    data=interaction_history,
                 )
-            else:
-                job_ids = []
 
-        jobs = job_listings.filter(id__in=list(set(job_ids)))
-        serializer = JobDetailsSerializer(jobs, many=True)
+            else:
+                if user_profile.skills:
+                    skills = user_profile.skills
+                    job_ids = self.get_results(
+                        model="cosine", job_listings_dict=job_listings_dict, data=skills
+                    )
+                else:
+                    job_ids = []
+
+            jobs = job_listings.filter(id__in=list(set(job_ids)))
+            CACHE[user_id] = jobs
+        serializer = JobDetailsSerializer(CACHE.get(user_id), many=True)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
     def recommendation_service(self, interaction, job_listings_dict, model, job_ids):
