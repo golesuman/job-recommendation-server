@@ -20,15 +20,10 @@ class RecommendationView(views.APIView):
 
         interactions = Interaction.objects.filter(user_id=user_id)
         user_profile = UserProfile.objects.filter(user_id=user_id).first()
-
-        job_listings_dict = cache.get("job_listings_dict")
-
-        if job_listings_dict is None:
-            job_listings = Job.objects.all()
-            job_listings_dict = {
-                str(job.id): job.title + "," + job.description for job in job_listings
-            }
-            cache.set("job_listings_dict", job_listings_dict)
+        job_listings = Job.objects.all()
+        job_listings_dict = {
+            str(job.id): job.title + "," + job.description for job in job_listings
+        }
 
         if interactions.count() > INTERACTION_LIMIT:
             interaction_history = [
@@ -50,7 +45,7 @@ class RecommendationView(views.APIView):
             else:
                 job_ids = []
 
-        jobs = Job.objects.filter(id__in=list(set(job_ids)))
+        jobs = job_listings.filter(id__in=list(set(job_ids)))
         serializer = JobDetailsSerializer(jobs, many=True)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
@@ -60,7 +55,7 @@ class RecommendationView(views.APIView):
         )
         for doc, similarity in recommendation:
             if similarity > THRESHOLD:
-                job_ids.append(doc)
+                job_ids.append((similarity, doc))
 
     def get_results(self, model, data, job_listings_dict):
         job_ids = []
@@ -73,4 +68,5 @@ class RecommendationView(views.APIView):
             self.recommendation_service(
                 data, job_listings_dict, model=model, job_ids=job_ids
             )
-        return job_ids
+        job_lists = sorted(job_ids, key=lambda x: x[0])[:5]
+        return [value for _, value in job_lists]
