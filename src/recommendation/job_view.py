@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from rest_framework import views, status
 from rest_framework.response import Response
 from .models import Job
@@ -6,17 +7,15 @@ from account.models import Interaction, UserProfile
 from .serializers import JobDetailsSerializer, JobPostSerializer
 from .algorithms_v2 import get_recommendations
 from django.core.cache import cache
-from datetime import datetime, timedelta
-from django.db.models import Q
 
 INTERACTION_LIMIT = 10
-THRESHOLD = 0.1
+THRESHOLD = 0.3
 
 
 CACHE = {}
 
 
-class RecommendationView(views.APIView):
+class JobDetailsView(views.APIView):
     def get(self, request, format=None):
         user_id = request.user.id
 
@@ -28,61 +27,37 @@ class RecommendationView(views.APIView):
             interactions = Interaction.objects.filter(user_id=user_id)
             user_profile = UserProfile.objects.filter(user_id=user_id).first()
             job_listings = Job.objects.all()
-            job_listings_dict = {}
-
-            # Filter jobs based on each interaction title and add them to job_listings_dict
+            job_listings_dict = {
+                str(job.id): job.title + "," + job.description for job in job_listings
+            }
 
             if interactions.count() > INTERACTION_LIMIT:
                 interaction_history = [
                     interaction.job.title + "," + interaction.job.description
                     for interaction in interactions
                 ]
-
-                for interaction in interactions:
-                    similar_jobs = job_listings.filter(
-                        Q(title__icontains=interaction.job.title)
-                    )
-                    for job in similar_jobs:
-                        job_listings_dict[str(job.id)] = (
-                            job.title + "," + job.description
-                        )
-
                 job_ids = self.get_results(
                     model="cosine",
                     job_listings_dict=job_listings_dict,
                     data=interaction_history,
                 )
 
-            # If no interactions found or job_listings_dict is empty, filter based on user skills
-            if not job_listings_dict:
+            else:
                 if user_profile.skills:
-                    user_skills = user_profile.skills.split(",")
-                    for skill in user_skills:
-                        similar_jobs = job_listings.filter(
-                            Q(title__icontains=skill) | Q(description__icontains=skill)
-                        )
-                        for job in similar_jobs:
-                            job_listings_dict[str(job.id)] = (
-                                job.title + "," + job.description
-                            )
+                    skills = user_profile.skills
                     job_ids = self.get_results(
-                        model="cosine",
-                        job_listings_dict=job_listings_dict,
-                        data=user_profile.skills,
+                        model="cosine", job_listings_dict=job_listings_dict, data=skills
                     )
-
                 else:
-                    # If neither interactions nor skills are available, return empty response
-                    return Response({"data": []}, status=status.HTTP_200_OK)
+                    job_ids = []
 
-            job_recommendations = job_listings.filter(id__in=set(list(job_ids)))
-            if job_recommendations:
-                CACHE[user_id] = {
-                    "data": job_recommendations,
-                    "timestamp": datetime.now(),  # Update timestamp
-                }
+            jobs = job_listings.filter(id__in=list(set(job_ids)))
+            CACHE[user_id] = {
+                "data": jobs,
+                "timestamp": datetime.now(),  # Update timestamp
+            }
 
-        serializer = JobDetailsSerializer(CACHE.get(user_id).get("data"), many=True)
+        serializer = JobDetailsSerializer(CACHE.get(user_id)["data"], many=True)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
     def is_cache_expired(self, user_id):
@@ -90,6 +65,7 @@ class RecommendationView(views.APIView):
         if cached_data:
             timestamp = cached_data.get("timestamp")
             if timestamp:
+                # Check if the timestamp is older than 1 hour
                 return datetime.now() - timestamp > timedelta(seconds=10)
         return True
 
@@ -103,11 +79,14 @@ class RecommendationView(views.APIView):
 
     def get_results(self, model, data, job_listings_dict):
         job_ids = []
-
         if isinstance(data, list):
             for interaction in data:
-                self.recommendation_service(interaction, job_listings_dict, job_ids)
+                self.recommendation_service(
+                    interaction, job_listings_dict, model=model, job_ids=job_ids
+                )
         else:
-            self.recommendation_service(data, job_listings_dict, model, job_ids)
-
-        return [value for _, value in sorted(job_ids, key=lambda x: x[0])[:5]]
+            self.recommendation_service(
+                data, job_listings_dict, model=model, job_ids=job_ids
+            )
+        job_lists = sorted(job_ids, key=lambda x: x[0])[:5]
+        return [value for _, value in job_lists]
