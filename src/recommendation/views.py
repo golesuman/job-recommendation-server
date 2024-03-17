@@ -117,19 +117,15 @@ class JobsPageAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        user_id = request.user.id
-        jobs = Job.objects.all()
-        if user_id is not None:
-            recommendation_service = JobRecommendationServices(
-                documents=jobs, user_id=user_id, interaction=None
-            )
-            results = recommendation_service.get_recommendations(n=20)
-            recommended_serializer = JobDetailsSerializer(results, many=True)
+        try:
+            jobs = Job.objects.all()
+            serializer = JobDetailsSerializer(instance=jobs, many=True)
             return response.Response(
-                {"data": recommended_serializer.data}, status=status.HTTP_200_OK
+                {"data": serializer.data}, status=status.HTTP_200_OK
             )
-        serializer = JobDetailsSerializer(instance=jobs, many=True)
-        return response.Response({"data": serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(str(e))
+            return response.Response({"data": "Internal Server Error"})
 
 
 class CompanyDetailsAPI(APIView):
