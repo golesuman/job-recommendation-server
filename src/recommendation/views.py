@@ -18,7 +18,7 @@ from account.models import Interaction, UserProfile
 from recommendation.utils.preprocess import remove_special_characters
 
 
-INTERACTION_LIMIT = 10
+INTERACTION_LIMIT = 4
 
 
 class JobDetailsView(APIView):
@@ -43,7 +43,6 @@ class JobDetailsView(APIView):
             # Initialize an empty list to store recommendations
             recommendations = []
 
-
             job_skills = (
                 re.split(r"[\s,|]+", job_details.skills) if job_details.skills else []
             )
@@ -61,12 +60,14 @@ class JobDetailsView(APIView):
                         job_details=job_details,
                         interaction=None,
                     )
-                    recommendations.extend(
-                        recommendation_service.get_recommendations(n=3)
-                    )
+                    recommendation = recommendation_service.get_recommendations(n=3)
+                    if recommendation:
+                        recommendations.extend(recommendation)
+                    # if recommendation does not exist just add the jobs that matches the title
+                    else:
+                        recommendations.extend(jobs)
 
             unique_recommendations = list(set(recommendations))
-
             if unique_recommendations:
                 recommended_serializer = JobDetailsSerializer(
                     unique_recommendations, many=True
