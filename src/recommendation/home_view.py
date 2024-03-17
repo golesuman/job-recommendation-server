@@ -106,8 +106,18 @@ class RecommendationView(views.APIView):
 
         if isinstance(data, list):
             for interaction in data:
-                self.recommendation_service(interaction, job_listings_dict, job_ids)
+                self.recommendation_service(
+                    interaction,
+                    job_listings_dict=job_listings_dict,
+                    model=model,
+                    job_ids=job_ids,
+                )
         else:
-            self.recommendation_service(data, job_listings_dict, model, job_ids)
+            self.recommendation_service(
+                data=data,
+                job_listings_dict=job_listings_dict,
+                model=model,
+                job_ids=job_ids,
+            )
 
         return [value for _, value in sorted(job_ids, key=lambda x: x[0])[:5]]
