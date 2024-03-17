@@ -97,20 +97,23 @@ class JobApplyView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        user_id = request.user.id
-        job_id = request.data.get("job_id")
-        interaction_type = "apply"
-        resp = create_interaction(
-            user_id=user_id, interaction_type=interaction_type, job_id=job_id
-        )
-        if resp is not None:
-            return response.Response(
-                {"data": "Applied Successfully"}, status=status.HTTP_200_OK
+        try:
+            user_id = request.user.id
+            job_id = request.data.get("job_id")
+            interaction_type = "apply"
+            resp = create_interaction(
+                user_id=user_id, interaction_type=interaction_type, job_id=job_id
             )
-        return response.Response(
-            {"data": "Already Exists"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+            if resp is not None:
+                return response.Response(
+                    {"data": "Applied Successfully"}, status=status.HTTP_200_OK
+                )
+            return response.Response(
+                {"data": "Already Exists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            return response.Response({"data": "Internal Server Error"})
 
 
 class JobsPageAPI(APIView):
