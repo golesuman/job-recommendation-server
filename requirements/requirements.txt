@@ -15,11 +15,14 @@ django==4.2.5
     #   -r requirements/requirements.in
     #   django-cors-headers
     #   django-filter
+    #   django-jazzmin
     #   djangorestframework
     #   drf-yasg
 django-cors-headers==4.2.0
     # via -r requirements/requirements.in
 django-filter==23.3
+    # via -r requirements/requirements.in
+django-jazzmin==2.6.0
     # via -r requirements/requirements.in
 djangorestframework==3.14.0
     # via
@@ -37,6 +40,8 @@ inflection==0.5.1
     # via drf-yasg
 iniconfig==2.0.0
     # via pytest
+numpy==1.26.4
+    # via -r requirements/requirements.in
 packaging==23.2
     # via
     #   build
@@ -51,6 +56,10 @@ psycopg2-binary==2.9.9
 pyproject-hooks==1.0.0
     # via build
 pytest==8.1.1
+    # via
+    #   -r requirements/requirements.in
+    #   pytest-django
+pytest-django==4.8.0
     # via -r requirements/requirements.in
 python-dateutil==2.9.0.post0
     # via faker
