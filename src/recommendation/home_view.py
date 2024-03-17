@@ -114,7 +114,7 @@ class RecommendationView(views.APIView):
                 )
         else:
             self.recommendation_service(
-                data=data,
+                interaction=data,
                 job_listings_dict=job_listings_dict,
                 model=model,
                 job_ids=job_ids,
