@@ -8,11 +8,13 @@ from .serializers import JobDetailsSerializer, JobPostSerializer
 from .algorithms_v2 import get_recommendations
 from django.core.cache import cache
 
-INTERACTION_LIMIT = 4
+INTERACTION_LIMIT = 10
 THRESHOLD = 0.3
 
 
 CACHE = {}
+
+# Currently not being used anymore
 
 
 class JobDetailsView(views.APIView):

@@ -9,7 +9,7 @@ from django.core.cache import cache
 from datetime import datetime, timedelta
 from django.db.models import Q
 
-INTERACTION_LIMIT = 3
+INTERACTION_LIMIT = 10
 THRESHOLD = 0.1
 
 

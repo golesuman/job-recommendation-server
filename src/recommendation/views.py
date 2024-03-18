@@ -18,9 +18,6 @@ from account.models import Interaction, UserProfile
 from recommendation.utils.preprocess import remove_special_characters
 
 
-INTERACTION_LIMIT = 4
-
-
 class JobDetailsView(APIView):
     permission_classes = [AllowAny]
 
