@@ -11,9 +11,10 @@ from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
-    help = "Closes the specified poll for voting"
+    help = "Seed the jobs data into the database"
 
     def extract_and_calculate_average(self, salary_string):
+        # randomly select the salary
         if re.search("[a-zA-Z]", salary_string):
             return random.choice([50000, 100000, 350000, 45000, 150000])
 
@@ -29,8 +30,6 @@ class Command(BaseCommand):
             return random.choice([50000, 100000, 350000, 45000, 150000])
 
     def handle(self, *args, **options):
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-        print(settings.BASE_DIR)
         job_data_path = os.path.join(
             settings.BASE_DIR, "static/data/job_data_naukri.csv"
         )
@@ -38,19 +37,16 @@ class Command(BaseCommand):
             reader = csv.DictReader(file)
             i = 0
             for row in reader:
-                job_id = row.get("job_id")
                 company_ids = [company.id for company in Company.objects.all()]
                 company_id = random.choice(company_ids)
 
                 title = row.get("Job Title")
                 salary = self.extract_and_calculate_average(row.get("Job Salary"))
-                description = row.get("description")
                 skills = row.get("Key Skills")
                 job_exp = row.get("Job Experience Required")
                 category = row.get("Functional Area").split(",")[0]
                 industry = row.get("Industry")
                 role_category = row.get("Role Category")
-                location = row.get("Location")
                 role = row.get("Role")
                 if company_id != " " and company_id is not None:
                     company = Company.objects.filter(id=int(float(company_id))).first()
@@ -68,7 +64,6 @@ class Command(BaseCommand):
                         experience=job_exp,
                         industry=industry,
                     )
-                    # print(company)
                 if i == 200:
                     break
 

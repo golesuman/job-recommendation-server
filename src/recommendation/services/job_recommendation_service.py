@@ -67,23 +67,6 @@ class JobRecommendationServices:
                     result > DEFAULT_THRESHOLD
                 ):  # please adjust values as your requirement
                     self.results[id] = result
-        else:
-            for id, value in tf_idf_matrix:
-                tf_idf_vector = value
-                for (
-                    interaction_id,
-                    interaction,
-                ) in self.preprocessed_interaction.items():
-                    job_vector = self.tfidf.fit_document(document=f"{interaction}")
-                    result = self.pearson.pearson_correlation(tf_idf_vector, job_vector)
-                    if (
-                        result > DEFAULT_THRESHOLD
-                    ):  # please adjust values as your requirement
-                        if self.results.get(id):
-                            self.results[id] += (result + self.results.get(id)) / 2
-                        else:
-                            self.results[id] = result
-
         return sorted(self.results.items(), key=lambda x: x[1], reverse=True)[:n]
 
     def get_recommendations(self, n, model="cosine"):  # model is cosine by default
