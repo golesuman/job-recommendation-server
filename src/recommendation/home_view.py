@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from .models import Job
 from account.models import Interaction, UserProfile
 
-from .utils.constants import DEFAULT_THRESHOLD, INTERACTION_LIMIT
-from .serializers import JobDetailsSerializer, JobPostSerializer
+from .utils.constants import INTERACTION_LIMIT
+from .serializers import JobDetailsSerializer
 from .algorithms_v2 import TextAnalyzer
 from datetime import datetime, timedelta
 from django.db.models import Q
@@ -79,10 +79,12 @@ class RecommendationView(views.APIView):
                         return Response({"data": []}, status=status.HTTP_200_OK)
 
                 if top_jobs:
+                    # put the top jobs in the cache if there are any
                     CACHE[user_id] = {
                         "data": top_jobs,
                         "timestamp": datetime.now(),  # Update timestamp
                     }
+            # give the response from the cache
 
             serializer = JobDetailsSerializer(CACHE.get(user_id).get("data"), many=True)
             return Response({"data": serializer.data}, status=status.HTTP_200_OK)
@@ -92,6 +94,15 @@ class RecommendationView(views.APIView):
             return Response({"data": "Internal Server Error"})
 
     def is_cache_expired(self, user_id):
+        """
+        Method to check if the cache is expired. If cache is older than 10 seconds then it is considered expired
+
+        Args:
+            user_id (int): user identifier
+
+        Returns:
+            Bool: Returns True if the cache is expired otherwise False
+        """
         cached_data = CACHE.get(user_id)
         if cached_data:
             timestamp = cached_data.get("timestamp")

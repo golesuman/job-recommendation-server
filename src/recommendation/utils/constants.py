@@ -172,7 +172,7 @@ STOP_WORDS = [
 
 INTERACTION_LIMIT = 10
 
-DEFAULT_THRESHOLD = 0.3
+DEFAULT_THRESHOLD = 0.2
 
 if __name__ == "__main__":
     # Display the list of stop words
