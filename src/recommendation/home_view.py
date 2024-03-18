@@ -3,15 +3,14 @@ from rest_framework.response import Response
 from .models import Job
 from account.models import Interaction, UserProfile
 
+from .utils.constants import DEFAULT_THRESHOLD, INTERACTION_LIMIT
 from .serializers import JobDetailsSerializer, JobPostSerializer
-from .algorithms_v2 import get_recommendations
-from django.core.cache import cache
+from .algorithms_v2 import TextAnalyzer
 from datetime import datetime, timedelta
 from django.db.models import Q
+from recommendation.services.job_recommendation_service import get_top_jobs
 
-INTERACTION_LIMIT = 10
-THRESHOLD = 0.1
-
+text_analyzer = TextAnalyzer()
 
 CACHE = {}
 
@@ -48,8 +47,9 @@ class RecommendationView(views.APIView):
                                 job.title + "," + job.description
                             )
 
-                    job_ids = self.get_results(
+                    top_jobs = get_top_jobs(
                         model="cosine",
+                        filtered_jobs=job_listings,
                         job_listings_dict=job_listings_dict,
                         data=interaction_history,
                     )
@@ -67,7 +67,8 @@ class RecommendationView(views.APIView):
                                 job_listings_dict[str(job.id)] = (
                                     job.title + "," + job.description
                                 )
-                        job_ids = self.get_results(
+                        top_jobs = get_top_jobs(
+                            filtered_jobs=job_listings,
                             model="cosine",
                             job_listings_dict=job_listings_dict,
                             data=user_profile.skills,
@@ -77,10 +78,9 @@ class RecommendationView(views.APIView):
                         # If neither interactions nor skills are available, return empty response
                         return Response({"data": []}, status=status.HTTP_200_OK)
 
-                job_recommendations = job_listings.filter(id__in=set(list(job_ids)))
-                if job_recommendations:
+                if top_jobs:
                     CACHE[user_id] = {
-                        "data": job_recommendations,
+                        "data": top_jobs,
                         "timestamp": datetime.now(),  # Update timestamp
                     }
 
@@ -88,6 +88,7 @@ class RecommendationView(views.APIView):
             return Response({"data": serializer.data}, status=status.HTTP_200_OK)
 
         except Exception as e:
+            print(e)
             return Response({"data": "Internal Server Error"})
 
     def is_cache_expired(self, user_id):
@@ -97,32 +98,3 @@ class RecommendationView(views.APIView):
             if timestamp:
                 return datetime.now() - timestamp > timedelta(seconds=10)
         return True
-
-    def recommendation_service(self, interaction, job_listings_dict, model, job_ids):
-        recommendation = get_recommendations(
-            interaction, job_listings_dict, model=model
-        )
-        for doc, similarity in recommendation:
-            if similarity > THRESHOLD:
-                job_ids.append((similarity, doc))
-
-    def get_results(self, model, data, job_listings_dict):
-        job_ids = []
-
-        if isinstance(data, list):
-            for interaction in data:
-                self.recommendation_service(
-                    interaction,
-                    job_listings_dict=job_listings_dict,
-                    model=model,
-                    job_ids=job_ids,
-                )
-        else:
-            self.recommendation_service(
-                interaction=data,
-                job_listings_dict=job_listings_dict,
-                model=model,
-                job_ids=job_ids,
-            )
-
-        return [value for _, value in sorted(job_ids, key=lambda x: x[0])[:5]]

@@ -169,6 +169,11 @@ STOP_WORDS = [
     "wouldn",
 ]
 
+
+INTERACTION_LIMIT = 10
+
+DEFAULT_THRESHOLD = 0.3
+
 if __name__ == "__main__":
     # Display the list of stop words
     print(STOP_WORDS)

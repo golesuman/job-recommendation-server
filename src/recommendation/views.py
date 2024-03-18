@@ -1,5 +1,3 @@
-import re
-from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework import response
@@ -7,15 +5,18 @@ from rest_framework import status
 from recommendation.services.job_interaction_service import (
     create_interaction,
     get_job_details,
-    get_jobs_by_interaction,
 )
-from .algorithms_v2 import get_recommendations
+from django.db.models import Q
+from .algorithms_v2 import TextAnalyzer
 
 from recommendation.serializers import CompanySerializer, JobDetailsSerializer
 from recommendation.models import Company, Job
-from recommendation.services.job_recommendation_service import JobRecommendationServices
-from account.models import Interaction, UserProfile
 from recommendation.utils.preprocess import remove_special_characters
+
+
+from recommendation.services.job_recommendation_service import get_top_jobs
+
+analyzer = TextAnalyzer()
 
 
 class JobDetailsView(APIView):
@@ -37,33 +38,35 @@ class JobDetailsView(APIView):
 
             create_interaction(user_id=user_id, job_id=job_id, interaction_type="click")
 
-            # Initialize an empty list to store recommendations
             recommendations = []
 
-            job_skills = (
-                re.split(r"[\s,|]+", job_details.skills) if job_details.skills else []
-            )
-            # jobs = Job.objects.exclude(id=job_)
+            job_listings_dict = {}
+
+            document = job_details.title
+            job_skills = analyzer.preprocess_document(document)
+
             for skill in [skill for skill in job_skills if skill != ""]:
                 skill = remove_special_characters(skill)
                 # Exclude the current job and filter jobs containing the skill
                 jobs = Job.objects.exclude(id=job_id).filter(
-                    title__icontains=skill.strip()
+                    Q(title__icontains=skill) | Q(description__icontains=skill)
                 )
-                if jobs.count() > 0:
-                    # Apply recommendation algorithm on the filtered jobs
-                    recommendation_service = JobRecommendationServices(
-                        documents=jobs,
-                        job_details=job_details,
-                        interaction=None,
-                    )
-                    recommendation = recommendation_service.get_recommendations(n=3)
-                    if recommendation:
-                        recommendations.extend(recommendation)
-                    # if recommendation does not exist just add the jobs that matches the title
-                    else:
-                        recommendations.extend(jobs)
 
+                if jobs.count() > 0:
+                    for job in jobs:
+                        job_listings_dict[str(job.id)] = (
+                            job.title + "," + job.description
+                        )
+
+                    recommendations.extend(
+                        get_top_jobs(
+                            filtered_jobs=jobs,
+                            data=job_details.title,
+                            # + job_details.skills for more accurate results
+                            job_listings_dict=job_listings_dict,
+                            model="cosine",
+                        )
+                    )
             unique_recommendations = list(set(recommendations))
             if unique_recommendations:
                 recommended_serializer = JobDetailsSerializer(
