@@ -176,7 +176,7 @@ class TextAnalyzer:
         else:
             return numerator / denominator
 
-    def get_recommendations(self, search_history, documents, model="cosine"):
+    def get_recommendations(self, data, documents, model="cosine"):
         self.clean_documents(documents)
         tfidf_matrix = []
 
@@ -184,13 +184,13 @@ class TextAnalyzer:
             tfidf_vector = self.generate_document_vector(doc)
             tfidf_matrix.append((key, tfidf_vector))
 
-        search_tfidf = self.generate_document_vector(search_history)
+        tf_idf_vector = self.generate_document_vector(data)
         similarities = []
         for _, doc_tfidf in tfidf_matrix:
             if model == "cosine":
-                similarities.append(self.cosine_similarity(search_tfidf, doc_tfidf))
+                similarities.append(self.cosine_similarity(tf_idf_vector, doc_tfidf))
             else:
-                similarities.append(self.pearson_similarity(search_tfidf, doc_tfidf))
+                similarities.append(self.pearson_similarity(tf_idf_vector, doc_tfidf))
 
         sorted_indices = np.argsort(similarities)[::-1]
 
