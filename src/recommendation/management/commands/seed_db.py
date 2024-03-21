@@ -13,22 +13,22 @@ class Command(BaseCommand):
     help = "Seed company data into db"
 
     def handle(self, *args, **options):
-        job_data_path = os.path.join(settings.BASE_DIR, "static/data/company_data.csv")
+        job_data_path = os.path.join(settings.BASE_DIR, "static/data/companies.csv")
 
         with open(job_data_path, "r") as file:
             reader = csv.DictReader(file)
             i = 0
             for row in reader:
                 company_id = row.get("company_id")
-                name = row.get("name")
-                description = row.get("description")
+                name = row.get("company_name")
+                description = row.get("overview")
 
-                url = row.get("url")
+                url = row.get("logo_link")
                 user = User.objects.get_or_create(username=name, password="12345678@")
 
                 Company.objects.get_or_create(
                     user_id=user[0].id,
-                    id=company_id,
+                    id=i,
                     name=name,
                     description=description,
                     website=url,
