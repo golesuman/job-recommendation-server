@@ -50,4 +50,4 @@ def get_top_jobs(filtered_jobs, data, job_listings_dict, model):
     if jobs_ids:
         jobs = filtered_jobs.filter(id__in=jobs_ids)
         return jobs
-    return None
+    return filtered_jobs

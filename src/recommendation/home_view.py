@@ -48,7 +48,7 @@ class RecommendationView(views.APIView):
                             )
 
                     top_jobs = get_top_jobs(
-                        model="cosine",
+                        model="pearson",
                         filtered_jobs=job_listings,
                         job_listings_dict=job_listings_dict,
                         data=interaction_history,
