@@ -112,14 +112,9 @@ class TextAnalyzer:
         num_docs_with_term = sum(
             1 for doc in self.cleaned_documents if term in doc.lower()
         )
-
-        if num_docs_with_term > 0:
-            log_result = 1 + math.log(
-                len(self.cleaned_documents) / num_docs_with_term
-            )  # 1 is added for smoothing
-            return log_result
-        else:
-            return 0
+        return 1 + math.log(
+            len(self.cleaned_documents) / num_docs_with_term + 1
+        )  # 1 is added for smoothing
 
     def preprocess_document(self, document):
         terms_list = re.split(r"[,\s|]+", document)
