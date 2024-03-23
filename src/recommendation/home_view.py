@@ -37,15 +37,17 @@ class RecommendationView(views.APIView):
                         interaction.job.title + "," + interaction.job.description
                         for interaction in interactions
                     ]
-
-                    for interaction in interactions:
-                        similar_jobs = job_listings.filter(
-                            Q(title__icontains=interaction.job.title)
-                        )
-                        for job in similar_jobs:
-                            job_listings_dict[str(job.id)] = (
-                                job.title + "," + job.description
-                            )
+                    for interaction in interaction_history:
+                        titles = text_analyzer.preprocess_document(interaction)
+                        for title in titles:
+                            similar_jobs = job_listings.filter(
+                                Q(title__icontains=title)
+                                | Q(description__icontains=title)
+                            )[:10]
+                            for job in similar_jobs:
+                                job_listings_dict[str(job.id)] = (
+                                    job.title + "," + job.description
+                                )
 
                     top_jobs = get_top_jobs(
                         model="pearson",

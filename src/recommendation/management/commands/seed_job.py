@@ -34,6 +34,7 @@ class Command(BaseCommand):
                 industry = "IT"
                 role_category = "IT"
                 role = ""
+                location = row.get("location")
                 if company_id != " " and company_id is not None:
                     company = Company.objects.filter(id=int(float(company_id))).first()
                     job = Job.objects.create(
@@ -48,8 +49,9 @@ class Command(BaseCommand):
                         skills=skills,
                         experience=job_exp,
                         industry=industry,
+                        location=location,
                     )
-                if i == 200:
+                if i == 1300:
                     break
 
                 i += 1
