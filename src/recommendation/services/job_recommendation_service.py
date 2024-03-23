@@ -41,7 +41,7 @@ def get_top_job_ids(data, job_listings_dict, model):
     else:
         populate_job_ids(data, job_listings_dict, model, job_ids)
 
-    return [value for _, value in sorted(job_ids, key=lambda x: x[0], reverse=True)[:5]]
+    return [value for _, value in sorted(job_ids, key=lambda x: x[0], reverse=True)]
 
 
 def get_top_jobs(filtered_jobs, data, job_listings_dict, model):
