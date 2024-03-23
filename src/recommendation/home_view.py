@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .models import Job
 from account.models import Interaction, UserProfile
 
-from .utils.constants import INTERACTION_LIMIT
+from .utils.constants import INTERACTION_LIMIT, INTERACTION_THRESHOLD
 from .serializers import JobDetailsSerializer
 from .algorithms_v2 import TextAnalyzer
 from datetime import datetime, timedelta
@@ -25,7 +25,10 @@ class RecommendationView(views.APIView):
 
             cached_data = CACHE.get(user_id)
             if cached_data is None or self.is_cache_expired(user_id):
-                interactions = Interaction.objects.filter(user_id=user_id)
+                # take the top 3 interactions that are recently recorded
+                interactions = Interaction.objects.filter(user_id=user_id).order_by(
+                    "-timestamp"
+                )[:INTERACTION_THRESHOLD]
                 user_profile = UserProfile.objects.filter(user_id=user_id).first()
                 job_listings = Job.objects.all()
                 job_listings_dict = {}

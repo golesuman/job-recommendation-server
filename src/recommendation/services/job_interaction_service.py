@@ -1,12 +1,18 @@
 from account.models import Interaction
 
 from recommendation.models import Job
+from datetime import datetime
 
 
 def is_interaction_present(user_id, interaction_type, job_id):
-    return Interaction.objects.filter(
+    interaction = Interaction.objects.filter(
         user_id=user_id, interaction_type=interaction_type, job_id=job_id
-    ).exists()
+    ).first()
+    if interaction:
+        interaction.timestamp = datetime.now()
+        interaction.save()
+        return True
+    return False
 
 
 def create_interaction(user_id, interaction_type, job_id):
