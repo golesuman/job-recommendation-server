@@ -24,7 +24,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True, null=True)
     profile_picture = models.ImageField(upload_to=get_file_path, blank=True, null=True)
-    skills = models.CharField(max_length=255, blank=True, null=True)
+    skills = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     experience = models.PositiveIntegerField(blank=True, null=True)
     education = models.CharField(max_length=255, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)

@@ -16,8 +16,8 @@ class Company(models.Model):
 
 class Job(models.Model):
     company = models.ForeignKey(to=Company, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255, null=True)
-    description = models.TextField(null=True)
+    title = models.CharField(max_length=255, null=True, db_index=True)
+    description = models.TextField(null=True, db_index=True)
     location = models.CharField(max_length=255, null=True)
     job_type = models.CharField(
         max_length=255,
@@ -31,7 +31,7 @@ class Job(models.Model):
     )
     industry = models.CharField(max_length=255, null=True)
     experience = models.CharField(max_length=1000)
-    skills = models.CharField(max_length=1000)
+    skills = models.CharField(max_length=1000, db_index=True)
     role = models.CharField(max_length=255)
     category = models.CharField(max_length=255, default="Entry-Level")
     salary = models.CharField(null=True, blank=True, max_length=255)

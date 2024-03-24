@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework import response
@@ -18,6 +19,9 @@ from recommendation.services.job_recommendation_service import get_top_jobs
 
 analyzer = TextAnalyzer()
 
+CACHE = {}
+CACHE_EXPIRATION_TIME = timedelta(seconds=30)  # Cache expiration time (30 secs)
+
 
 class JobDetailsView(APIView):
     permission_classes = [AllowAny]
@@ -26,17 +30,28 @@ class JobDetailsView(APIView):
         try:
             user_id = request.user.id
             job_id = self.kwargs.get("job_id")
+
+            # Check if the data is cached and not expired
+            cached_data = CACHE.get(job_id)
+            if cached_data and not self.is_cache_expired(job_id):
+                return response.Response(
+                    {"data": cached_data}, status=status.HTTP_200_OK
+                )
+
             # Fetch details for the original job
             job_details = get_job_details(job_id)
 
-            if job_details:
-                serializer = JobDetailsSerializer(job_details)
-            if user_id is None:
+            if not job_details:
                 return response.Response(
-                    {"data": serializer.data}, status=status.HTTP_200_OK
+                    {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
                 )
 
-            create_interaction(user_id=user_id, job_id=job_id, interaction_type="click")
+            serializer = JobDetailsSerializer(job_details)
+
+            if user_id is not None:
+                create_interaction(
+                    user_id=user_id, job_id=job_id, interaction_type="click"
+                )
 
             recommendations = []
 
@@ -67,6 +82,7 @@ class JobDetailsView(APIView):
                             model="cosine",
                         )
                     )
+
             unique_recommendations = list(set(recommendations))
             if unique_recommendations:
                 recommended_serializer = JobDetailsSerializer(
@@ -76,21 +92,43 @@ class JobDetailsView(APIView):
                     "job_details": serializer.data,
                     "recommendations": recommended_serializer.data,
                 }
-                return response.Response({"data": detail_response})
+
+                # Cache the response with expiration time
+                CACHE[job_id] = {
+                    "data": detail_response,
+                    "timestamp": datetime.now(),
+                }
+                return response.Response(
+                    {"data": detail_response}, status=status.HTTP_200_OK
+                )
 
             elif len(unique_recommendations) == 0:
                 return response.Response(
                     {"data": serializer.data}, status=status.HTTP_200_OK
                 )
 
-            return response.Response(
-                {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
-            )
         except Exception as e:
             return response.Response(
                 {"data": f"Internal Server Error {e}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+    def is_cache_expired(self, job_id):
+        """
+        Method to check if the cache for a job_id is expired.
+
+        Args:
+            job_id (int): Job identifier
+
+        Returns:
+            Bool: Returns True if the cache is expired otherwise False
+        """
+        cached_data = CACHE.get(job_id)
+        if cached_data:
+            timestamp = cached_data.get("timestamp")
+            if timestamp:
+                return datetime.now() - timestamp > CACHE_EXPIRATION_TIME
+        return True
 
 
 class JobApplyView(APIView):
