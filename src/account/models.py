@@ -49,3 +49,10 @@ class Interaction(models.Model):
 
     def __str__(self) -> str:
         return f"{str(self.user.username)}-{str(self.job.title)}-{str(self.interaction_type)}"
+
+
+class InteractionSummary(Interaction):
+    class Meta:
+        proxy = True
+        verbose_name = "Interaction Summary"
+        verbose_name_plural = "Interaction Summary"

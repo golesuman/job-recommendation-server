@@ -31,6 +31,9 @@ class Command(BaseCommand):
                 skills = row.get("three_reasons")
                 job_exp = "Mid Level"
                 category = row.get("taglist")
+                job_type = random.choice(
+                    ["Full-Time", "Part-Time", "Freelance", "Contract"]
+                )
                 industry = "IT"
                 role_category = "IT"
                 role = ""
@@ -42,7 +45,7 @@ class Command(BaseCommand):
                         company=company,
                         description=role_category,
                         category=category,
-                        job_type=category,
+                        job_type=job_type,
                         salary=salary,
                         is_active=True,
                         role=role,

@@ -1,11 +1,11 @@
 from django.urls import path
 
-
 from recommendation.views import (
     CompanyDetailsAPI,
     JobDetailsView,
     JobApplyView,
     JobsPageAPI,
+    JobSummaryView,
 )
 from recommendation.home_view import RecommendationView
 
@@ -17,4 +17,5 @@ urlpatterns = [
         "company/<int:company_id>", CompanyDetailsAPI.as_view(), name="company_details"
     ),
     path("home", RecommendationView.as_view(), name="home_page"),
+    path("job-summary", JobSummaryView.as_view(), name="job_summary"),
 ]

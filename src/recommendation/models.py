@@ -47,3 +47,10 @@ class Job(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class JobSummary(Job):
+    class Meta:
+        proxy = True
+        verbose_name = "Job Summary"
+        verbose_name_plural = "Job Summary"

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.http import JsonResponse
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.views import APIView
 from rest_framework import response
 from rest_framework import status
@@ -7,7 +8,7 @@ from recommendation.services.job_interaction_service import (
     create_interaction,
     get_job_details,
 )
-from django.db.models import Q
+from django.db.models import Q, Count, Sum
 from .algorithms_v2 import TextAnalyzer
 
 from recommendation.serializers import CompanySerializer, JobDetailsSerializer
@@ -184,3 +185,17 @@ class CompanyDetailsAPI(APIView):
         return response.Response(
             {"data": "Company Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
         )
+
+
+class JobSummaryView(APIView):
+    # IsAdminUser
+    permission_classes = [
+        AllowAny,
+    ]
+
+    def get(self, request, *args, **kwargs):
+        filter_by = request.query_params.get("filter-by")
+
+        job_data = Job.objects.values(filter_by).annotate(count=Count(filter_by))
+        data = {entry[filter_by]: entry["count"] for entry in job_data}
+        return JsonResponse(data)
