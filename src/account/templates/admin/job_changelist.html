@@ -1,49 +1,63 @@
 {% extends "admin/base_site.html" %} {% load static %} {% block content %}
 <div
   class="chart-container"
-  style="position: relative; height: 60vh; width: 90vw"
+  style="position: relative; height: 40vh; width: 80vw"
 >
-  <canvas id="myChart"></canvas>
+  <canvas id="jobChart" style="height: 100%; width: 100%"></canvas>
 </div>
+
+<div
+  class="chart-container"
+  style="position: relative; height: 40vh; width: 80vw"
+>
+  <canvas id="interactionChart" style="height: 100%; width: 100%"></canvas>
+</div>
+
 <div class="filter-section">
-  <label for="filterBySelect">Filter By:</label>
-  <select id="filterBySelect" class="filter-select">
-    <option value="job_type">Job Type</option>
-    <option value="industry">Industry</option>
-    <option value="category">Category</option>
-  </select>
-  <button id="updateChart" class="update-button">Update Chart Data</button>
+  <div class="filter-controls">
+    <label for="filterBySelect">Filter By:</label>
+    <select id="filterBySelect" class="filter-select">
+      <option value="job_type">Job Type</option>
+      <option value="industry">Industry</option>
+      <option value="category">Category</option>
+    </select>
+    <button id="updateChart" class="update-button">Update Chart Data</button>
+  </div>
 </div>
 {% endblock %} {% block extrajs %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
   $(document).ready(function () {
-    renderChart();
+    renderCharts();
 
-    function renderChart() {
-      var filterBy = $("#filterBySelect").val(); // Get the selected value
+    function renderCharts() {
+      renderChart("jobChart", "{% url 'job_summary' %}", "Job");
+      renderChart(
+        "interactionChart",
+        "{% url 'interaction_summary' %}",
+        "Interaction by Day"
+      );
+    }
+
+    function renderChart(chartId, url, labelPrefix) {
+      var filterBy = $("#filterBySelect").val();
 
       $.ajax({
-        url: "{% url 'job_summary' %}?filter-by=" + filterBy,
+        url: url + "?filter-by=" + filterBy,
         dataType: "json",
         success: function (data) {
-          var labels = [];
-          var chartData = [];
+          var labels = Object.keys(data);
+          var chartData = Object.values(data);
 
-          for (var category in data) {
-            labels.push(category);
-            chartData.push(data[category]);
-          }
-
-          var ctx = document.getElementById("myChart").getContext("2d");
-          window.myChart = new Chart(ctx, {
+          var ctx = document.getElementById(chartId).getContext("2d");
+          window[chartId] = new Chart(ctx, {
             type: "bar",
             data: {
               labels: labels,
               datasets: [
                 {
-                  label: "Summary of Jobs by " + filterBy,
+                  label: labelPrefix + " Summary by " + filterBy,
                   data: chartData,
                   backgroundColor: [
                     "rgba(255, 99, 132, 0.2)",
@@ -66,6 +80,8 @@
               ],
             },
             options: {
+              maintainAspectRatio: false,
+              responsive: true,
               scales: {
                 y: {
                   beginAtZero: true,
@@ -76,27 +92,40 @@
         },
       });
     }
-    function destroyChart() {
-      myChart.destroy();
+
+    function destroyCharts() {
+      if (window.jobChart) {
+        jobChart.destroy();
+      }
+      if (window.interactionChart) {
+        interactionChart.destroy();
+      }
     }
 
-    // Click event for updating chart data
     $("#updateChart").click(function () {
-      destroyChart();
-      renderChart();
+      destroyCharts();
+      renderCharts();
     });
 
-    // Change event for dropdown selection
     $("#filterBySelect").change(function () {
-      destroyChart();
-      renderChart();
+      destroyCharts();
+      renderCharts();
     });
   });
 </script>
+
 <style>
   /* Custom styles for the filter section */
   .filter-section {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
     margin-top: 20px;
+  }
+
+  .filter-controls {
+    display: flex;
+    align-items: center;
   }
 
   .filter-select {
@@ -119,6 +148,10 @@
   .update-button:hover {
     background-color: #0056b3;
     border-color: #0056b3;
+  }
+
+  .chart-container {
+    margin-bottom: 20px;
   }
 </style>
 {% endblock %}

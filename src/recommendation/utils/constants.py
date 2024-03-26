@@ -169,8 +169,10 @@ STOP_WORDS = [
     "wouldn",
 ]
 
+# this to switch the model
 
-INTERACTION_LIMIT = 1
+INTERACTION_LIMIT = 5
+# this is to get the 3 latest interaction
 INTERACTION_THRESHOLD = 3
 
 DEFAULT_THRESHOLD = 0.2
