@@ -36,7 +36,7 @@ class JobDetailsView(APIView):
             cached_data = CACHE.get(job_id)
             if cached_data and not self.is_cache_expired(job_id):
                 return response.Response(
-                    {"data": cached_data}, status=status.HTTP_200_OK
+                    {"data": cached_data.get("data")}, status=status.HTTP_200_OK
                 )
 
             # Fetch details for the original job

@@ -1,9 +1,12 @@
 from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from account.models import Interaction
+from django.db.models.functions import TruncDate
 from .serializers import (
     InteractionSerializer,
     UserProfileSerializer,
@@ -13,6 +16,7 @@ from .services.user_profile_service import (
     get_latest_user_interactions,
     get_user_profile,
 )
+from django.db.models import Count
 
 # Create your views here.
 from rest_framework.views import APIView
@@ -86,3 +90,22 @@ class UserSignUpAPI(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class InteractionSummaryView(APIView):
+    # IsAdminUser
+    permission_classes = [
+        AllowAny,
+    ]
+
+    def get(self, request, *args, **kwargs):
+        interaction_data = (
+            Interaction.objects.annotate(day=TruncDate("timestamp"))
+            .values("day")
+            .annotate(count=Count("id"))
+            .order_by("day")
+        )
+
+        data = {str(entry["day"]): entry["count"] for entry in interaction_data}
+
+        return JsonResponse(data)

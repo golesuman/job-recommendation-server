@@ -5,7 +5,7 @@ from django.db.models import Count, Sum
 
 # Register your models here.
 admin.site.register(UserProfile)
-# admin.site.register(Interaction)
+admin.site.register(Interaction)
 
 
 @admin.register(InteractionSummary)

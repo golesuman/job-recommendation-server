@@ -1,5 +1,124 @@
-{% load humanize %} {% extends “admin/change_list.html” %} {% block
-content_title %}
-<h1>Interaction Summary</h1>
-{% endblock %} {% block result_list %} This is our content {% endblock %} {%
-block pagination %}{% endblock %}
+{% extends "admin/base_site.html" %} {% load static %} {% block content %}
+<div
+  class="chart-container"
+  style="position: relative; height: 60vh; width: 90vw"
+>
+  <canvas id="myChart"></canvas>
+</div>
+<div class="filter-section">
+  <label for="filterBySelect">Filter By:</label>
+  <select id="filterBySelect" class="filter-select">
+    <option value="job_type">Job Type</option>
+    <option value="industry">Industry</option>
+    <option value="category">Category</option>
+  </select>
+  <button id="updateChart" class="update-button">Update Chart Data</button>
+</div>
+{% endblock %} {% block extrajs %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  $(document).ready(function () {
+    renderChart();
+
+    function renderChart() {
+      var filterBy = $("#filterBySelect").val(); // Get the selected value
+
+      $.ajax({
+        url: "{% url 'job_summary' %}?filter-by=" + filterBy,
+        dataType: "json",
+        success: function (data) {
+          var labels = [];
+          var chartData = [];
+
+          for (var category in data) {
+            labels.push(category);
+            chartData.push(data[category]);
+          }
+
+          var ctx = document.getElementById("myChart").getContext("2d");
+          window.myChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Summary of Jobs by " + filterBy,
+                  data: chartData,
+                  backgroundColor: [
+                    "rgba(255, 99, 132, 0.2)",
+                    "rgba(54, 162, 235, 0.2)",
+                    "rgba(255, 206, 86, 0.2)",
+                    "rgba(75, 192, 192, 0.2)",
+                    "rgba(153, 102, 255, 0.2)",
+                    "rgba(255, 159, 64, 0.2)",
+                  ],
+                  borderColor: [
+                    "rgba(255, 99, 132, 1)",
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(255, 206, 86, 1)",
+                    "rgba(75, 192, 192, 1)",
+                    "rgba(153, 102, 255, 1)",
+                    "rgba(255, 159, 64, 1)",
+                  ],
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            },
+          });
+        },
+      });
+    }
+    function destroyChart() {
+      myChart.destroy();
+    }
+
+    // Click event for updating chart data
+    $("#updateChart").click(function () {
+      destroyChart();
+      renderChart();
+    });
+
+    // Change event for dropdown selection
+    $("#filterBySelect").change(function () {
+      destroyChart();
+      renderChart();
+    });
+  });
+</script>
+<style>
+  /* Custom styles for the filter section */
+  .filter-section {
+    margin-top: 20px;
+  }
+
+  .filter-select {
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+
+  .update-button {
+    padding: 8px 16px;
+    font-size: 16px;
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+
+  .update-button:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+</style>
+{% endblock %}
