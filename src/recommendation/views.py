@@ -32,6 +32,11 @@ class JobDetailsView(APIView):
             user_id = request.user.id
             job_id = self.kwargs.get("job_id")
 
+            if user_id is not None:
+                create_interaction(
+                    user_id=user_id, job_id=job_id, interaction_type="click"
+                )
+
             # Check if the data is cached and not expired
             cached_data = CACHE.get(job_id)
             if cached_data and not self.is_cache_expired(job_id):
@@ -48,11 +53,6 @@ class JobDetailsView(APIView):
                 )
 
             serializer = JobDetailsSerializer(job_details)
-
-            if user_id is not None:
-                create_interaction(
-                    user_id=user_id, job_id=job_id, interaction_type="click"
-                )
 
             recommendations = []
 
@@ -152,6 +152,7 @@ class JobApplyView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
+            print()
             return response.Response({"data": "Internal Server Error"})
 
 

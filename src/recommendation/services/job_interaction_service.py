@@ -9,7 +9,7 @@ def is_interaction_present(user_id, interaction_type, job_id):
         user_id=user_id, interaction_type=interaction_type, job_id=job_id
     ).first()
     if interaction:
-        interaction.timestamp = datetime.now()
+        interaction.timestamp = datetime.now().astimezone()
         interaction.save()
         return True
     return False

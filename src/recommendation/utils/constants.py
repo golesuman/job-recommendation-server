@@ -171,9 +171,9 @@ STOP_WORDS = [
 
 # this to switch the model
 
-INTERACTION_LIMIT = 5
-# this is to get the 3 latest interaction
-INTERACTION_THRESHOLD = 3
+INTERACTION_LIMIT = 3
+# this is to get the 10 latest interaction
+INTERACTION_THRESHOLD = 10
 
 DEFAULT_THRESHOLD = 0.2
 
