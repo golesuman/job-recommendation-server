@@ -6,84 +6,127 @@ from .utils.constants import STOP_WORDS
 
 
 class PorterStemmer:
+    def __init__(self):
+        self.vowels = ["a", "e", "i", "o", "u"]
+        self.step1a_suffixes = ["sses", "ies", "ss", "s"]
+        self.step1b_suffixes = ["eed", "ed", "ing"]
+        self.step2_suffixes = ["at", "bl", "iz"]
+        self.step3_suffixes = ["ational", "ate", "tional", "tion"]
+        self.step4_suffixes = ["alize", "icate", "iciti", "ical", "ful", "ness"]
+        self.step5a_suffixes = [
+            "al",
+            "ance",
+            "ence",
+            "er",
+            "ic",
+            "able",
+            "ible",
+            "ant",
+            "ement",
+            "ment",
+            "ent",
+        ]
+        self.step5b_suffixes = ["e", "l"]
+
     def stem(self, word):
-        """
-        Apply the Porter Stemmer algorithm to a word and return the stemmed word.
-        """
-        # Step 1a
-        if word.endswith("sses"):
-            word = word[:-2]
-        elif word.endswith("ies"):
-            word = word[:-2]
-        elif word.endswith("ss"):
-            pass
-        elif word.endswith("s"):
-            word = word[:-1]
+        if len(word) < 3:
+            return word
 
-        # Step 1b
-        if word.endswith("eed"):
-            if len(re.findall(r"[aeiou]", word[:-3])) > 0:
-                word = word[:-1]
-        elif re.search(r"([aeiou].*?)(ed|ing)$", word):
-            stem = re.sub(r"([aeiou].*?)(ed|ing)$", r"\1", word)
-            if re.search(r"[aeiou]", stem):
-                word = stem
-                if word.endswith("at") or word.endswith("bl") or word.endswith("iz"):
-                    word += "e"
-                elif len(re.findall(r"[^aeiou]([aeiou][^aeioulsz])$", word)) == 1:
-                    word = word[:-1]
-                elif len(re.findall(r"([aeiou][^aeioulsz])$", word)) == 1:
-                    word += "e"
-
-        # Step 1c
-        if re.search(r"([aeiou][^aeiou])y$", word):
-            word = re.sub(r"([aeiou][^aeiou])y$", r"\1i", word)
-
-        # Step 2
-        if len(word) > 1:
-            word = re.sub(
-                r"(ational|tional|enci|anci|izer|bli|alli|entli|eli|ousli|ization|ation|ator|alism|iveness|fulness|ousness|aliti|iviti|biliti)$",
-                r"\1",
-                word,
-            )
-            if re.search(r"(alli|ousli|fulli|entli)$", word):
-                word = word[:-2]
-            elif re.search(
-                r"(ational|tional|alize|icate|iciti|ative|ical|ness|ful)$", word
-            ):
-                word = word[:-4]
-            elif re.search(r"(ic|ative|al|ive)$", word):
-                word = word[:-3]
-
-        # Step 3
-        if len(word) > 1:
-            word = re.sub(r"ness$", "", word)
-            if re.search(
-                r"(ational|tional|ate|iciti|ical|ance|ence|ize|ive|ous|ful)$", word
-            ):
-                word = word[:-4]
-
-        # Step 4
-        if len(word) > 1:
-            if re.search(
-                r"(ement|ment|able|ible|ance|ence|ate|iti|ion|al|er|ic|ou|ive)$", word
-            ):
-                word = word[:-3]
-            elif re.search(r"(ant|ent|ism|ate|iti|ous|ive|ize)$", word):
-                word = word[:-2]
-            elif re.search(r"e$", word):
-                if len(word) > 2 or len(re.findall(r"[aeiou]", word[:-1])) > 1:
-                    word = word[:-1]
-
-        # Step 5a
-        if re.search(r"[aeiou].*([st])$", word):
-            word = word[:-1]
-
-        # Step 5b
-        if len(re.findall(r"[aeiou].*[aeiou].*[lsz]$", word)) > 1:
-            word = word[:-1]
+        word = self.step1a(word)
+        word = self.step1b(word)
+        word = self.step2(word)
+        word = self.step3(word)
+        word = self.step4(word)
+        word = self.step5a(word)
+        word = self.step5b(word)
 
         return word
+
+    def step1a(self, word):
+        for suffix in self.step1a_suffixes:
+            if word.endswith(suffix):
+                if suffix == "sses" or suffix == "ies":
+                    if len(word) > len(suffix):
+                        return word[:-2]
+                    else:
+                        return word
+                else:
+                    return word[:-1]
+        return word
+
+    def step1b(self, word):
+        for suffix in self.step1b_suffixes:
+            if word.endswith(suffix):
+                if suffix == "eed":
+                    if self.count_consonant_sequences(word[:-3]) > 0:
+                        return word[:-1]
+                    else:
+                        return word
+                elif self.contains_vowel(word[: -len(suffix)]):
+                    return self.stem(word[: -len(suffix)])
+                else:
+                    return word
+        return word
+
+    def step2(self, word):
+        for suffix in self.step2_suffixes:
+            if word.endswith(suffix):
+                stem = word[: -len(suffix)]
+                if self.count_consonant_sequences(stem) > 0:
+                    return stem
+                else:
+                    return word
+        return word
+
+    def step3(self, word):
+        for suffix in self.step3_suffixes:
+            if word.endswith(suffix):
+                stem = word[: -len(suffix)]
+                if self.count_consonant_sequences(stem) > 0:
+                    return stem
+                else:
+                    return word
+        return word
+
+    def step4(self, word):
+        for suffix in self.step4_suffixes:
+            if word.endswith(suffix):
+                stem = word[: -len(suffix)]
+                if self.count_consonant_sequences(stem) > 1:
+                    return stem
+                else:
+                    return word
+        return word
+
+    def step5a(self, word):
+        for suffix in self.step5a_suffixes:
+            if word.endswith(suffix):
+                stem = word[: -len(suffix)]
+                if self.count_consonant_sequences(stem) > 1:
+                    return stem
+                else:
+                    return word
+        return word
+
+    def step5b(self, word):
+        if word.endswith("ll") and self.count_consonant_sequences(word[:-1]) > 1:
+            return word[:-1]
+        return word
+
+    def count_consonant_sequences(self, word):
+        count = 0
+        vowels = self.vowels
+        for i in range(len(word)):
+            if word[i] not in vowels and (i == 0 or word[i - 1] in vowels):
+                count += 1
+        return count
+
+    def contains_vowel(self, word):
+        vowels = self.vowels
+        for char in word:
+            if char in vowels:
+                return True
+        return False
 
 
 class TextAnalyzer:
