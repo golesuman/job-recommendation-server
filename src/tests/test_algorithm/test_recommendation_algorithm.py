@@ -1,62 +1,94 @@
-from math import ceil
 import pytest
 import numpy as np
 from recommendation.algorithms_v2 import (
-    remove_special_characters,
-    calculate_tf,
-    calculate_idf,
-    preprocess,
-    clean_documents,
-    fit_document,
-    cosine_similarity,
-    pearson_similarity,
-    get_recommendations,
+    PorterStemmer,
+    TextAnalyzer,
 )
+import math
 
 
-def test_remove_special_characters():
-    assert remove_special_characters("Hello! World.") == "Hello World"
-    assert remove_special_characters("This is a test!") == "This is a test"
+@pytest.fixture
+def stemmer():
+    return PorterStemmer()
 
 
-def test_calculate_tf():
-    terms = ["hello", "world", "hello", "python", "world"]
-    tf_dict = calculate_tf(terms)
+@pytest.fixture
+def analyzer():
+    return TextAnalyzer()
+
+
+def test_porter_stemmer_count_consonant_sequences(stemmer):
+    assert stemmer.count_consonant_sequences("tr") == 1
+    assert stemmer.count_consonant_sequences("o") == 0
+    assert stemmer.count_consonant_sequences("trash") == 2
+
+
+def test_porter_stemmer_contains_vowel(stemmer):
+    assert stemmer.contains_vowel("hello") is True
+    assert stemmer.contains_vowel("xyz") is False
+    assert stemmer.contains_vowel("aeiou") is True
+
+
+def test_text_analyzer_clean_special_characters(analyzer):
+    assert analyzer.clean_special_characters("Hello!") == "Hello"
+    assert analyzer.clean_special_characters("This is a test.") == "This is a test"
+
+
+def test_text_analyzer_calculate_term_frequency(analyzer):
+    terms_list = ["hello", "world", "hello", "python", "world"]
+    tf_dict = analyzer.calculate_term_frequency(terms_list)
     assert tf_dict == {"hello": 0.4, "world": 0.4, "python": 0.2}
 
 
-# Test calculate_idf function
-def test_calculate_idf():
-    cleaned_documents = ["hello world", "world python", "python python"]
-    assert calculate_idf("hello", cleaned_documents) == 2.09861228866811
-    assert calculate_idf("world", cleaned_documents) == 1.4054651081081644
-    assert calculate_idf("python", cleaned_documents) == 1.4054651081081644
+def test_text_analyzer_calculate_inverse_document_frequency(analyzer):
+    analyzer.cleaned_documents = ["hell0", "world", "python", "python"]
+    assert analyzer.calculate_inverse_document_frequency("hello") == 2.386294361119891
+    assert analyzer.calculate_inverse_document_frequency("world") == 1.6931471805599454
+    assert analyzer.calculate_inverse_document_frequency("python") == 1.2876820724517808
 
 
-# Test preprocess function
-def test_preprocess():
+def test_text_analyzer_preprocess_document(analyzer):
     document = "Hello, world! This is a test."
-    cleaned_terms = preprocess(document)
-    assert cleaned_terms == ["hello", "world", "tes"]
+    cleaned_terms = analyzer.preprocess_document(document)
+    assert cleaned_terms == ["hello", "world", "test"]
 
 
-# Test clean_documents function
-def test_clean_documents():
+def test_text_analyzer_clean_documents(analyzer):
     documents = {
         "doc1": "Hello, world!",
         "doc2": "Python is awesome.",
     }
-    cleaned_documents = clean_documents(documents)
-    assert cleaned_documents == ["hello world", "python awesom"]
+    analyzer.clean_documents(documents)
+    assert analyzer.cleaned_documents == ["hello world", "python awesome"]
 
 
-def test_cosine_similarity():
+def test_text_analyzer_cosine_similarity(analyzer):
     vec1 = np.array([1, 2, 3])
     vec2 = np.array([2, 4, 6])
-    assert cosine_similarity(vec1, vec2) == 1.0
+    assert analyzer.cosine_similarity(vec1, vec2) == 1.0
 
 
-def test_pearson_similarity():
+def test_text_analyzer_pearson_similarity(analyzer):
     vec1 = np.array([1, 2, 3])
     vec2 = np.array([2, 4, 6])
-    assert ceil(pearson_similarity(vec1, vec2)) == 1.0
+    assert math.ceil(analyzer.pearson_similarity(vec1, vec2)) == 1.0
+
+
+def test_text_analyzer_get_recommendations_cosine(analyzer):
+    data = "Python programming is fun"
+    documents = {
+        "doc1": "Python programming is awesome",
+        "doc2": "I love programming in Python",
+    }
+    recommendations = analyzer.get_recommendations(data, documents, model="cosine")
+    assert recommendations[0][0] == "doc1"
+
+
+def test_text_analyzer_get_recommendations_pearson(analyzer):
+    data = "Python programming is fun"
+    documents = {
+        "doc1": "Python programming is awesome",
+        "doc2": "I love programming in Python",
+    }
+    recommendations = analyzer.get_recommendations(data, documents, model="pearson")
+    assert recommendations[0][0] == "doc1"

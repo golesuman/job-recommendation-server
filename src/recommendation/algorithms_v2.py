@@ -156,7 +156,7 @@ class TextAnalyzer:
             1 for doc in self.cleaned_documents if term in doc.lower()
         )
         return 1 + math.log(
-            len(self.cleaned_documents) / num_docs_with_term + 1
+            len(self.cleaned_documents) / (num_docs_with_term + 1)
         )  # 1 is added for smoothing
 
     def preprocess_document(self, document):
