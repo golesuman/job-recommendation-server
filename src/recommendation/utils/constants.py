@@ -174,7 +174,7 @@ INTERACTION_LIMIT = 3
 # this is to get the 10 latest interaction
 INTERACTION_THRESHOLD = 10
 
-DEFAULT_THRESHOLD = 0.4
+DEFAULT_THRESHOLD = 0.2
 
 if __name__ == "__main__":
     # Display the list of stop words

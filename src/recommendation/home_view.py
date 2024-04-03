@@ -54,7 +54,7 @@ class RecommendationView(views.APIView):
                             similar_jobs = job_listings.filter(
                                 Q(title__icontains=title)
                                 | Q(description__icontains=title)
-                            )[:10]
+                            )[:INTERACTION_THRESHOLD]
                             for job in similar_jobs:
                                 job_listings_dict[str(job.id)] = (
                                     job.title + "," + job.description
