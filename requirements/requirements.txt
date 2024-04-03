@@ -53,6 +53,8 @@ packaging==23.2
     #   build
     #   drf-yasg
     #   pytest
+pillow==10.3.0
+    # via -r requirements/requirements.in
 pip-tools==7.3.0
     # via -r requirements/requirements.in
 pluggy==1.4.0

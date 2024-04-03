@@ -11,3 +11,4 @@ numpy
 django-jazzmin
 pytest_django
 nltk
+Pillow
