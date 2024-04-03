@@ -40,7 +40,9 @@ class RecommendationView(views.APIView):
                 job_listings_dict = {}
 
                 # Filter jobs based on each interaction title and add them to job_listings_dict
-
+                job_listings = job_listings.exclude(
+                    id__in=[interaction.job.id for interaction in interactions]
+                )
                 if interactions.count() > INTERACTION_LIMIT:
                     interaction_history = [
                         interaction.job.title + "," + interaction.job.description

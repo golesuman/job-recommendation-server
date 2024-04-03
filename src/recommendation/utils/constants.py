@@ -170,11 +170,11 @@ STOP_WORDS = [
 
 # this to switch the model
 
-INTERACTION_LIMIT = 2
+INTERACTION_LIMIT = 3
 # this is to get the 10 latest interaction
 INTERACTION_THRESHOLD = 10
 
-DEFAULT_THRESHOLD = 0.3
+DEFAULT_THRESHOLD = 0.4
 
 if __name__ == "__main__":
     # Display the list of stop words
