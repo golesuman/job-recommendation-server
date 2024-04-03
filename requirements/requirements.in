@@ -10,3 +10,4 @@ factory_boy
 numpy
 django-jazzmin
 pytest_django
+nltk
