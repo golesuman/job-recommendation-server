@@ -83,16 +83,21 @@ class RecommendationView(views.APIView):
                         # If neither interactions nor skills are available, return empty response
                         return Response({"data": []}, status=status.HTTP_200_OK)
 
+                recommendation_with_scores = []
                 if top_jobs:
+                    for sim, job in top_jobs:
+                        job_serializer = JobDetailsSerializer(job, context=sim)
+                        recommendation_with_scores.append(job_serializer.data)
                     # put the top jobs in the cache if there are any
-                    CACHE[user_id] = {
-                        "data": top_jobs,
-                        "timestamp": datetime.now(),  # Update timestamp
-                    }
+                CACHE[user_id] = {
+                    "data": recommendation_with_scores,
+                    "timestamp": datetime.now(),  # Update timestamp
+                }
             # give the response from the cache
 
-            serializer = JobDetailsSerializer(CACHE.get(user_id).get("data"), many=True)
-            return Response({"data": serializer.data}, status=status.HTTP_200_OK)
+            return Response(
+                {"data": CACHE.get(user_id, {}).get("data")}, status=status.HTTP_200_OK
+            )
 
         except Exception as e:
             print(e)

@@ -41,7 +41,8 @@ class JobDetailsView(APIView):
             cached_data = CACHE.get(job_id)
             if cached_data and not self.is_cache_expired(job_id):
                 return response.Response(
-                    {"data": cached_data.get("data")}, status=status.HTTP_200_OK
+                    {"data": cached_data.get("data")},
+                    status=status.HTTP_200_OK,
                 )
 
             # Fetch details for the original job
@@ -86,21 +87,23 @@ class JobDetailsView(APIView):
 
             unique_recommendations = list(set(recommendations))
             if unique_recommendations:
-                recommended_serializer = JobDetailsSerializer(
-                    unique_recommendations, many=True
-                )
-                detail_response = {
-                    "job_details": serializer.data,
-                    "recommendations": recommended_serializer.data,
+                recommendation_with_scores = []
+                for sim, job in unique_recommendations:
+                    job_serializer = JobDetailsSerializer(job, context=sim)
+
+                    recommendation_with_scores.append(job_serializer.data)
+                # put the top jobs in the cache if there are any
+                CACHE[job_id] = {
+                    "data": {
+                        "job_details": serializer.data,
+                        "recommendations": recommendation_with_scores,
+                    },
+                    "timestamp": datetime.now(),  # Update timestamp
                 }
 
-                # Cache the response with expiration time
-                CACHE[job_id] = {
-                    "data": detail_response,
-                    "timestamp": datetime.now(),
-                }
                 return response.Response(
-                    {"data": detail_response}, status=status.HTTP_200_OK
+                    {"data": CACHE.get(job_id, {}).get("data")},
+                    status=status.HTTP_200_OK,
                 )
 
             elif len(unique_recommendations) == 0:
@@ -152,7 +155,7 @@ class JobApplyView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
-            print()
+            print(e)
             return response.Response({"data": "Internal Server Error"})
 
 
