@@ -57,4 +57,4 @@ def get_top_jobs(filtered_jobs, data, job_listings_dict, model):
             if job is not None:
                 jobs.append((sim, job))
         return jobs
-    return filtered_jobs
+    return [(0, job) for job in filtered_jobs]

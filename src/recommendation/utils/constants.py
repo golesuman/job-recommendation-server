@@ -15,7 +15,6 @@ STOP_WORDS = [
     "he",
     "in",
     "is",
-    "it",
     "its",
     "of",
     "on",
@@ -171,11 +170,11 @@ STOP_WORDS = [
 
 # this to switch the model
 
-INTERACTION_LIMIT = 3
+INTERACTION_LIMIT = 2
 # this is to get the 10 latest interaction
 INTERACTION_THRESHOLD = 10
 
-DEFAULT_THRESHOLD = 0.2
+DEFAULT_THRESHOLD = 0.3
 
 if __name__ == "__main__":
     # Display the list of stop words

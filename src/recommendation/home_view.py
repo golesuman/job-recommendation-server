@@ -24,6 +24,12 @@ class RecommendationView(views.APIView):
                 return Response({"data": None}, status=status.HTTP_200_OK)
 
             cached_data = CACHE.get(user_id)
+            if cached_data and not self.is_cache_expired(user_id):
+                return Response(
+                    {"data": cached_data.get("data")},
+                    status=status.HTTP_200_OK,
+                )
+
             if cached_data is None or self.is_cache_expired(user_id):
                 # take the top 3 interactions that are recently recorded
                 interactions = Interaction.objects.filter(user_id=user_id).order_by(
@@ -89,15 +95,19 @@ class RecommendationView(views.APIView):
                         job_serializer = JobDetailsSerializer(job, context=sim)
                         recommendation_with_scores.append(job_serializer.data)
                     # put the top jobs in the cache if there are any
-                CACHE[user_id] = {
-                    "data": recommendation_with_scores,
-                    "timestamp": datetime.now(),  # Update timestamp
-                }
-            # give the response from the cache
+                    CACHE[user_id] = {
+                        "data": recommendation_with_scores,
+                        "timestamp": datetime.now(),  # Update timestamp
+                    }
+                    # give the response from the cache
 
-            return Response(
-                {"data": CACHE.get(user_id, {}).get("data")}, status=status.HTTP_200_OK
-            )
+                    return Response(
+                        {"data": CACHE.get(user_id, {}).get("data")},
+                        status=status.HTTP_200_OK,
+                    )
+
+                    # If neither interactions nor skills are available, return empty response
+                return Response({"data": []}, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(e)

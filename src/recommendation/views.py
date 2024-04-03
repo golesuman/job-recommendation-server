@@ -53,7 +53,7 @@ class JobDetailsView(APIView):
                     {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
                 )
 
-            serializer = JobDetailsSerializer(job_details)
+            serializer = JobDetailsSerializer(job_details, context=0)
 
             recommendations = []
 
@@ -165,7 +165,7 @@ class JobsPageAPI(APIView):
     def get(self, request, *args, **kwargs):
         try:
             jobs = Job.objects.all()
-            serializer = JobDetailsSerializer(instance=jobs, many=True)
+            serializer = JobDetailsSerializer(instance=jobs, many=True, context=0)
             return response.Response(
                 {"data": serializer.data}, status=status.HTTP_200_OK
             )
