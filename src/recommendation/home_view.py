@@ -98,7 +98,7 @@ class RecommendationView(views.APIView):
                         recommendation_with_scores.append(job_serializer.data)
                     # put the top jobs in the cache if there are any
                     CACHE[user_id] = {
-                        "data": recommendation_with_scores,
+                        "data": sorted(recommendation_with_scores, key=lambda x: x["similarity_score"], reverse=True),
                         "timestamp": datetime.now(),  # Update timestamp
                     }
                     # give the response from the cache

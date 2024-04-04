@@ -96,7 +96,11 @@ class JobDetailsView(APIView):
                 CACHE[job_id] = {
                     "data": {
                         "job_details": serializer.data,
-                        "recommendations": recommendation_with_scores,
+                        "recommendations": sorted(
+                            recommendation_with_scores,
+                            key=lambda x: x["similarity_score"],
+                            reverse=True,
+                        ),
                     },
                     "timestamp": datetime.now(),  # Update timestamp
                 }
