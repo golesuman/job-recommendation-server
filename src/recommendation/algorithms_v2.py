@@ -112,4 +112,6 @@ class TextAnalyzer:
         recommendations = [
             (tfidf_matrix[i][0], similarities[i]) for i in sorted_indices
         ]
+        print(f"{data}--->{tf_idf_vector}")
+        print(recommendations)
         return recommendations
