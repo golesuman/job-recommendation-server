@@ -2,6 +2,8 @@ import math
 import re
 import numpy as np
 
+from recommendation.models import Job
+
 from .utils.constants import STOP_WORDS
 from nltk.stem import PorterStemmer
 
@@ -100,18 +102,31 @@ class TextAnalyzer:
             tfidf_matrix.append((key, tfidf_vector))
 
         tf_idf_vector = self.generate_document_vector(data)
+        print("Job vector--------------->", end="")
+        print(f"{tf_idf_vector}")
         similarities = []
-        for _, doc_tfidf in tfidf_matrix:
+        for id, doc_tfidf in tfidf_matrix:
+            # print(f"{Job.objects.filter(id=id).first()}------->{doc_tfidf}")
+
             if model == "cosine":
                 similarities.append(self.cosine_similarity(tf_idf_vector, doc_tfidf))
             else:
                 similarities.append(self.pearson_similarity(tf_idf_vector, doc_tfidf))
 
         sorted_indices = np.argsort(similarities)[::-1]
+        # recommendations = []
+        # for i in sorted_indices:
+        #     print(f"{Job.objects.filter(id=tfidf_matrix[i][0])} -------->")
 
         recommendations = [
             (tfidf_matrix[i][0], similarities[i]) for i in sorted_indices
         ]
-        print(f"{data}--->{tf_idf_vector}")
-        print(recommendations)
-        return recommendations
+
+        for i in sorted_indices:
+            if similarities[i] > 0.2:
+                print(f"{Job.objects.filter(id=tfidf_matrix[i][0]).first()}")
+                print("-----------------vector--------------")
+                print(tfidf_matrix[i][1])
+                print(f"similarity score-------->{similarities[i]}")
+
+        return tf_idf_vector, recommendations

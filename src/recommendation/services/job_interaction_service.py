@@ -30,6 +30,7 @@ def create_interaction(user_id, interaction_type, job_id):
 def get_job_details(job_id):
     try:
         job = Job.objects.filter(id=job_id).first()
+        # print()
         return job
     except Job.DoesNotExist as e:
         print(e)
