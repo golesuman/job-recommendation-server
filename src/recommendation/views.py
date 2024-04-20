@@ -47,7 +47,7 @@ class JobDetailsView(APIView):
 
             # Fetch details for the original job
             job_details = get_job_details(job_id)
-
+            print(job_details)
             if not job_details:
                 return response.Response(
                     {"data": "Job Doesn't Exist"}, status=status.HTTP_404_NOT_FOUND
