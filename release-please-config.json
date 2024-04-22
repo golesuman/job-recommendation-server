@@ -5,7 +5,7 @@
     "packages": {
         ".": {
             "extra-files": [
-                "src/version.py"
+                "src/test.md"
             ]
         }
     }
