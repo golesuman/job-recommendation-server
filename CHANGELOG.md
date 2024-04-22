@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.2.0](https://github.com/job-insights/job-recommendation-server/compare/v1.1.0...v1.2.0) (2024-04-22)
+
+
+### Features
+
+* add release me config file ([ec81a39](https://github.com/job-insights/job-recommendation-server/commit/ec81a3985c3e6a6ad629be90b5547ab11c3097fd))
+* bump version ([8273145](https://github.com/job-insights/job-recommendation-server/commit/8273145bd484be53aaa1791e178a5dd408bd3bab))
+* just use the release file ([cdd7da0](https://github.com/job-insights/job-recommendation-server/commit/cdd7da06c5e989265574aa2ed6bfa701b68835a2))
+* print the user skills and user name ([485b359](https://github.com/job-insights/job-recommendation-server/commit/485b359da8cbc968e6bb8738585210a622287606))
+* remove version file ([e31c27b](https://github.com/job-insights/job-recommendation-server/commit/e31c27bcd3241427aef40baeff08813646ba95b7))
+* remove version.txt file ([3a81423](https://github.com/job-insights/job-recommendation-server/commit/3a8142326a6baefe2018133696b790c688b61381))
+* update path to version file ([b55b712](https://github.com/job-insights/job-recommendation-server/commit/b55b7128a74812bd784c1a1226e80a2778865657))
+* version file ([cd15d8d](https://github.com/job-insights/job-recommendation-server/commit/cd15d8da63d039dbbcfd7316d8f5d545bb5ad8a7))
+* version file ([6fd10ce](https://github.com/job-insights/job-recommendation-server/commit/6fd10cef1f116820d41b8679e6f5368035dd209c))
+* version file to bump ([4417535](https://github.com/job-insights/job-recommendation-server/commit/441753566b8f09887d987fde7502f4b50e16f273))
+
+
+### Bug Fixes
+
+* add extra files in ci ([6ab57fc](https://github.com/job-insights/job-recommendation-server/commit/6ab57fcba91a4f61552dd3b9c37413c208568c12))
+* config for release-please ([76f9d6f](https://github.com/job-insights/job-recommendation-server/commit/76f9d6f100725851a0bcc1897f177295ede4a1a4))
+* manifest file ([0310d1a](https://github.com/job-insights/job-recommendation-server/commit/0310d1a0319932f45a71f668915b5f232689a3cc))
+* release-please ci config ([5ff6c87](https://github.com/job-insights/job-recommendation-server/commit/5ff6c87d55b14f8c33d82d16cb27bc71a860e34c))
+* use md file to track the version ([1dcced6](https://github.com/job-insights/job-recommendation-server/commit/1dcced649b9e4bc8fd34999a06ac5466a937f44a))
+
 ## [1.1.0](https://github.com/job-insights/job-recommendation-server/compare/v1.0.0...v1.1.0) (2024-04-22)
 
 
