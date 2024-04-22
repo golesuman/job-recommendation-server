@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/job-insights/job-recommendation-server/compare/v1.1.0...v1.2.0) (2024-04-22)
+
+
+### Features
+
+* remove version.txt file ([3a81423](https://github.com/job-insights/job-recommendation-server/commit/3a8142326a6baefe2018133696b790c688b61381))
+* update path to version file ([b55b712](https://github.com/job-insights/job-recommendation-server/commit/b55b7128a74812bd784c1a1226e80a2778865657))
+
 ## [1.1.0](https://github.com/job-insights/job-recommendation-server/compare/v1.0.0...v1.1.0) (2024-04-22)
 
 
