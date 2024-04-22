@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/job-insights/job-recommendation-server/compare/v1.0.0...v1.1.0) (2024-04-22)
+
+
+### Features
+
+* bump the version in version file ([61e9456](https://github.com/job-insights/job-recommendation-server/commit/61e9456135f42b59cb7ad96c01f1bb8852585587))
+
 ## 1.0.0 (2024-04-22)
 
 
