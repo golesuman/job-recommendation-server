@@ -18,8 +18,4 @@ jobs:
       uses: google-github-actions/release-please-action@v4
       with:
         token: ${{ secrets.CI_RELEASE_PLEASE_TOKEN }}
-        release-type: python
-        extra-files: |
-            src/__version__.py
-
-
+        release-type: simple
