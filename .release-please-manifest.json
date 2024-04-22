@@ -1,9 +1,3 @@
 {
-    "extra-files": [
-        {
-            "type": "generic",
-            "path": "__version__.py"
-        }
-    ],
     ".": "1.1.0"
 }
