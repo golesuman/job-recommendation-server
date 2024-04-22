@@ -1,6 +1,6 @@
 {
     "extra-files": [
-        "src/__version__.py"
+        "./src/__version__.py"
     ],
     ".": "1.1.0"
 }
