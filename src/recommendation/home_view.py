@@ -71,6 +71,8 @@ class RecommendationView(views.APIView):
                 if not job_listings_dict:
                     if user_profile.skills:
                         user_skills = user_profile.skills.split(",")
+                        print(f"User ---> {request.user.username}")
+                        print(f"{user_skills}")
                         for skill in user_skills:
                             similar_jobs = job_listings.filter(
                                 Q(title__icontains=skill)
@@ -98,7 +100,11 @@ class RecommendationView(views.APIView):
                         recommendation_with_scores.append(job_serializer.data)
                     # put the top jobs in the cache if there are any
                     CACHE[user_id] = {
-                        "data": sorted(recommendation_with_scores, key=lambda x: x["similarity_score"], reverse=True),
+                        "data": sorted(
+                            recommendation_with_scores,
+                            key=lambda x: x["similarity_score"],
+                            reverse=True,
+                        ),
                         "timestamp": datetime.now(),  # Update timestamp
                     }
                     # give the response from the cache

@@ -102,7 +102,7 @@ class TextAnalyzer:
             tfidf_matrix.append((key, tfidf_vector))
 
         tf_idf_vector = self.generate_document_vector(data)
-        print("Job vector--------------->", end="")
+        print("Input vector--------------->", end="")
         print(f"{tf_idf_vector}")
         similarities = []
         for id, doc_tfidf in tfidf_matrix:
