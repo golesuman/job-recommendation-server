@@ -10,10 +10,6 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0  # fetch the entire history
     - name: Release 
       uses: google-github-actions/release-please-action@v4
       with:
