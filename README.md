@@ -27,3 +27,5 @@ Backend for job recommendation algorithm using Hybrid Approach (Switching Method
     ```
     python manage.py runserver
     ```
+
+>**If you want to learn more about the project, the complete project report is in the docs folder**
