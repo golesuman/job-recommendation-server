@@ -1,4 +1,4 @@
->**Note**: The some db queries are in the views itself but needs to be moved to utils or model managers for better maitainability
+>**Note**: This is an academic project so most of the algorithms have been implemented from scratch and some db queries are in the views itself but needs to be moved to utils or model managers for better maitainability
 
 # Job-recommendation-server
 Backend for job recommendation algorithm using Hybrid Approach (Switching Method)
