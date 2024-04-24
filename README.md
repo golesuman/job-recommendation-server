@@ -1,5 +1,7 @@
+>**Note**: The some db queries are in the views itself but needs to be moved to utils or model managers for better maitainability
+
 # Job-recommendation-server
-Backend for job recommendation algorithm and training
+Backend for job recommendation algorithm using Hybrid Approach (Switching Method)
 
 ## Steps to run the project
 1. Clone the repo 
