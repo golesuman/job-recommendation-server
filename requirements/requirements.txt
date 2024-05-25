@@ -38,6 +38,8 @@ factory-boy==3.3.0
     # via -r requirements/requirements.in
 faker==24.1.0
     # via factory-boy
+gunicorn==22.0.0
+    # via -r requirements/requirements.in
 inflection==0.5.1
     # via drf-yasg
 iniconfig==2.0.0
@@ -52,6 +54,7 @@ packaging==23.2
     # via
     #   build
     #   drf-yasg
+    #   gunicorn
     #   pytest
 pillow==10.3.0
     # via -r requirements/requirements.in
